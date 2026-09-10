@@ -465,3 +465,27 @@ exports.classResultsSend = asyncHandler(async (req, res) => {
   req.flash('success', 'Results confirmed and sent to the admin for review.');
   res.redirect(`/teacher/class-results?class=${classId}&term=${termId}`);
 });
+
+// ============================================================
+// MESSAGES (inbox)
+// ============================================================
+exports.messages = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const [rows] = await db.query(
+    `SELECT m.id, m.subject, m.body, m.created_at, m.audience, mr.is_read, s.name AS sender_name
+     FROM message_recipients mr JOIN messages m ON m.id=mr.message_id LEFT JOIN users s ON s.id=m.sender_id
+     WHERE mr.user_id=? ORDER BY m.created_at DESC LIMIT 50`, [userId]);
+  res.render('teacher/messages', { title: 'Messages', messages: rows, active: 'messages' });
+});
+
+exports.messageRead = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const [rows] = await db.query(
+    `SELECT m.*, s.name AS sender_name FROM messages m
+     JOIN message_recipients mr ON mr.message_id=m.id AND mr.user_id=?
+     LEFT JOIN users s ON s.id=m.sender_id WHERE m.id=?`, [userId, req.params.id]);
+  if (!rows.length) { req.flash('error', 'Message not found.'); return res.redirect('/teacher/messages'); }
+  await db.query(
+    'UPDATE message_recipients SET is_read=1, read_at=NOW() WHERE message_id=? AND user_id=?', [req.params.id, userId]);
+  res.render('teacher/message-view', { title: 'Message', msg: rows[0], active: 'messages' });
+});

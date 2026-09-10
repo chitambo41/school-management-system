@@ -13,20 +13,27 @@ const { sendMail } = require('../config/mailer');
 
 // ============================================================
 // CURRENT-CLASS ASSIGNMENT (one class per student in the active year)
+// Returns: { ok: true } or { ok: false, error: '...', existingClass: '...' }
 // ============================================================
 async function assignStudentClass(studentId, classId) {
-  if (!classId) return false;
+  if (!classId) return { ok: false, error: 'No class selected.' };
   const [yr] = await db.query('SELECT id FROM academic_years WHERE is_active=1 ORDER BY id LIMIT 1');
-  if (!yr.length) return false;
-  // Remove other current enrollments for the active year, then enroll in the new class
-  await db.query(
-    'DELETE FROM student_class_enrollments WHERE student_id=? AND term_id IN (SELECT id FROM terms WHERE academic_year_id=?)',
-    [studentId, yr[0].id]);
+  if (!yr.length) return { ok: false, error: 'No active academic year.' };
+
+  // Check if student already has an enrollment in the active year
+  const [existing] = await db.query(
+    `SELECT sce.id, c.name AS class_name FROM student_class_enrollments sce
+     JOIN terms t ON t.id=sce.term_id JOIN classes c ON c.id=sce.class_id
+     WHERE sce.student_id=? AND t.academic_year_id=?`, [studentId, yr[0].id]);
+  if (existing.length) {
+    return { ok: false, error: `Student is already assigned to ${existing[0].class_name} this year. Remove them from that class first.`, existingClass: existing[0].class_name };
+  }
+
   const [term] = await db.query('SELECT id FROM terms WHERE academic_year_id=? ORDER BY id LIMIT 1', [yr[0].id]);
-  if (!term.length) return false;
+  if (!term.length) return { ok: false, error: 'No term found for the active year.' };
   await db.query('INSERT INTO student_class_enrollments (student_id, class_id, term_id) VALUES (?,?,?)',
     [studentId, classId, term[0].id]);
-  return true;
+  return { ok: true };
 }
 
 // ============================================================
@@ -141,7 +148,7 @@ exports.students = asyncHandler(async (req, res) => {
   const classId = req.query.class || '';
   const search = req.query.q || '';
   let sql = `SELECT s.id, s.name, s.admission_no, s.gender, s.date_of_birth, s.status,
-                    u.name AS parent_name
+                    s.guardian_name, u.name AS parent_name
              FROM students s
              LEFT JOIN users u ON u.id = s.parent_user_id
              WHERE s.deleted_at IS NULL`;
@@ -192,14 +199,21 @@ exports.studentCreateForm = asyncHandler(async (req, res) => {
 
 exports.studentCreate = asyncHandler(async (req, res) => {
   const admNo = 'S-' + new Date().getFullYear() + '-' + String(Math.floor(1000 + Math.random()*9000));
+  let guardianName = req.body.guardian_name || null;
+  let parentId = req.body.parent_user_id || null;
+  // If a registered parent was selected, auto-fill guardian_name from their account
+  if (parentId && !guardianName) {
+    const [[p]] = await db.query('SELECT name FROM users WHERE id=?', [parentId]);
+    if (p) guardianName = p.name;
+  }
   const [r] = await db.query(
-    `INSERT INTO students (parent_user_id, admission_no, name, date_of_birth, gender, address, previous_school, enrollment_date)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [req.body.parent_user_id || null, admNo, req.body.name, req.body.date_of_birth, req.body.gender, req.body.address || null, req.body.previous_school || null, req.body.enrollment_date || new Date()]
+    `INSERT INTO students (parent_user_id, guardian_name, admission_no, name, date_of_birth, gender, address, previous_school, enrollment_date)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [parentId, guardianName, admNo, req.body.name, req.body.date_of_birth, req.body.gender, req.body.address || null, req.body.previous_school || null, req.body.enrollment_date || new Date()]
   );
   if (req.body.class_id) {
-    const added = await assignStudentClass(r.insertId, req.body.class_id);
-    if (!added) req.flash('error', 'Could not enroll: no active academic year/term.');
+    const res2 = await assignStudentClass(r.insertId, req.body.class_id);
+    if (!res2.ok) req.flash('error', res2.error);
   }
   await logActivity(req.user.id, 'student.create', `Created student ${req.body.name}`, req.ip);
   req.flash('success', 'Student created. Admission No: ' + admNo);
@@ -220,15 +234,21 @@ exports.studentEditForm = asyncHandler(async (req, res) => {
 });
 
 exports.studentUpdate = asyncHandler(async (req, res) => {
+  let guardianName = req.body.guardian_name || null;
+  let parentId = req.body.parent_user_id || null;
+  if (parentId && !guardianName) {
+    const [[p]] = await db.query('SELECT name FROM users WHERE id=?', [parentId]);
+    if (p) guardianName = p.name;
+  }
   await db.query(
-    `UPDATE students SET parent_user_id=?, name=?, date_of_birth=?, gender=?, address=?, previous_school=?, status=? WHERE id=?`,
-    [req.body.parent_user_id || null, req.body.name, req.body.date_of_birth, req.body.gender, req.body.address || null, req.body.previous_school || null, req.body.status || 'active', req.params.id]
+    `UPDATE students SET parent_user_id=?, guardian_name=?, name=?, date_of_birth=?, gender=?, address=?, previous_school=?, status=? WHERE id=?`,
+    [parentId, guardianName, req.body.name, req.body.date_of_birth, req.body.gender, req.body.address || null, req.body.previous_school || null, req.body.status || 'active', req.params.id]
   );
   // Assign / move the student to the selected class (parent sees it immediately)
   const classId = req.body.class_id || null;
   if (classId) {
-    const done = await assignStudentClass(req.params.id, classId);
-    if (!done) req.flash('error', 'Could not assign class: no active academic year/term.');
+    const res2 = await assignStudentClass(req.params.id, classId);
+    if (!res2.ok) req.flash('error', res2.error);
   }
   await logActivity(req.user.id, 'student.update', `Updated student #${req.params.id}${classId ? ' (class ' + classId + ')' : ''}`, req.ip);
   req.flash('success', 'Student updated.');
@@ -330,7 +350,11 @@ exports.classes = asyncHandler(async (req, res) => {
 
 exports.classCreateForm = asyncHandler(async (req, res) => {
   const [teachers] = await db.query('SELECT t.id, u.name FROM teachers t JOIN users u ON u.id=t.user_id WHERE t.deleted_at IS NULL ORDER BY u.name');
-  const [students] = await db.query('SELECT id, name, admission_no FROM students WHERE deleted_at IS NULL AND status="active" ORDER BY name');
+  const [students] = await db.query(
+    `SELECT id, name, admission_no FROM students WHERE deleted_at IS NULL AND status='active'
+     AND id NOT IN (SELECT sce.student_id FROM student_class_enrollments sce
+       JOIN terms t ON t.id=sce.term_id JOIN academic_years ay ON ay.id=t.academic_year_id WHERE ay.is_active=1)
+     ORDER BY name`);
   const [subjects] = await db.query('SELECT id, name FROM subjects WHERE deleted_at IS NULL ORDER BY name');
   res.render('admin/class-form', { title: 'Add Class', cls: null, teachers, students, subjects, assignments: [], teacherId: null, enrolled: [], active: 'classes' });
 });
@@ -371,12 +395,15 @@ exports.classCreate = asyncHandler(async (req, res) => {
 
   // Enroll selected students into the class (current class for the active year)
   const ids = req.body.student_ids;
+  const assignErrors = [];
   if (ids) {
     const arr = Array.isArray(ids) ? ids : [ids];
     for (const sid of arr) {
-      await assignStudentClass(sid, classId);
+      const res2 = await assignStudentClass(sid, classId);
+      if (!res2.ok) assignErrors.push(res2.error);
     }
   }
+  if (assignErrors.length) req.flash('error', 'Some students could not be enrolled: ' + [...new Set(assignErrors)].join('; '));
   await logActivity(req.user.id, 'class.create', `Created class ${req.body.name}`, req.ip);
   req.flash('success', 'Class created.');
   res.redirect('/admin/classes');
@@ -386,10 +413,20 @@ exports.classEditForm = asyncHandler(async (req, res) => {
   const [c] = await db.query('SELECT * FROM classes WHERE id=? AND deleted_at IS NULL', [req.params.id]);
   if (!c.length) { req.flash('error', 'Class not found.'); return res.redirect('/admin/classes'); }
   const [teachers] = await db.query('SELECT t.id, u.name FROM teachers t JOIN users u ON u.id=t.user_id WHERE t.deleted_at IS NULL ORDER BY u.name');
-  const [students] = await db.query('SELECT id, name, admission_no FROM students WHERE deleted_at IS NULL AND status="active" ORDER BY name');
+  const [students] = await db.query(
+    `SELECT id, name, admission_no FROM students WHERE deleted_at IS NULL AND status='active'
+     AND (id IN (SELECT sce.student_id FROM student_class_enrollments sce
+       JOIN terms t ON t.id=sce.term_id JOIN academic_years ay ON ay.id=t.academic_year_id
+       WHERE sce.class_id=? AND ay.is_active=1)
+     OR id NOT IN (SELECT sce2.student_id FROM student_class_enrollments sce2
+       JOIN terms t2 ON t2.id=sce2.term_id JOIN academic_years ay2 ON ay2.id=t2.academic_year_id WHERE ay2.is_active=1))
+     ORDER BY name`, [req.params.id]);
   const [subjects] = await db.query('SELECT id, name FROM subjects WHERE deleted_at IS NULL ORDER BY name');
   const [ct] = await db.query('SELECT teacher_id FROM class_teacher_assignments WHERE class_id=? AND subject_id IS NULL LIMIT 1', [req.params.id]);
-  const [enr] = await db.query('SELECT student_id FROM student_class_enrollments WHERE class_id=?', [req.params.id]);
+  const [enr] = await db.query(
+    `SELECT sce.student_id FROM student_class_enrollments sce
+     JOIN terms t ON t.id=sce.term_id JOIN academic_years ay ON ay.id=t.academic_year_id
+     WHERE sce.class_id=? AND ay.is_active=1`, [req.params.id]);
   const [assigned] = await db.query(
     `SELECT cta.subject_id, cta.teacher_id FROM class_teacher_assignments cta
      JOIN subjects s ON s.id=cta.subject_id
@@ -439,12 +476,15 @@ exports.classUpdate = asyncHandler(async (req, res) => {
 
   // Add newly selected students (moves them to this class for the active year)
   const ids = req.body.student_ids;
+  const assignErrors = [];
   if (ids) {
     const arr = Array.isArray(ids) ? ids : [ids];
     for (const sid of arr) {
-      await assignStudentClass(sid, req.params.id);
+      const res2 = await assignStudentClass(sid, req.params.id);
+      if (!res2.ok) assignErrors.push(res2.error);
     }
   }
+  if (assignErrors.length) req.flash('error', 'Some students could not be enrolled: ' + [...new Set(assignErrors)].join('; '));
   req.flash('success', 'Class updated.');
   res.redirect('/admin/classes');
 });

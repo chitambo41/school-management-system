@@ -162,7 +162,8 @@ const server = app.listen(0, async () => {
   // 3) Teacher pages
   const teacherCookie = await login(port, 'teacher1@school.com', 'Teacher@123');
   const teacherPages = ['/teacher', '/teacher/classes', '/teacher/classes/1', '/teacher/attendance/1', '/teacher/attendance-history/1',
-    '/teacher/marks/1/1?exam=1', '/teacher/comments/1?term=1', '/teacher/results?class=1&term=1', '/teacher/class-results?class=1&term=1'];
+    '/teacher/marks/1/1?exam=1', '/teacher/comments/1?term=1', '/teacher/results?class=1&term=1', '/teacher/class-results?class=1&term=1',
+    '/teacher/messages'];
   for (const p of teacherPages) await assertPage(`TEACHER GET ${p}`, 'GET', p, teacherCookie, null);
 
   // 4) Parent pages

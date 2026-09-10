@@ -13,12 +13,28 @@
         </div>
         <div class="col-md-6">
           <label class="form-label">Parent / Guardian</label>
-          <select name="parent_user_id" class="form-select">
-            <option value="">— None —</option>
-            <% parents.forEach(p => { %>
-              <option value="<%= p.id %>" <%= student && student.parent_user_id == p.id ? 'selected' : '' %>><%= p.name %> (<%= p.email %>)</option>
-            <% }) %>
-          </select>
+          <% const hasParent = student && student.parent_user_id; const hasGuardian = student && student.guardian_name && !student.parent_user_id; %>
+          <div class="d-flex gap-3 mb-2">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="parent_mode" id="modeType" value="type" <%= !hasParent ? 'checked' : '' %>>
+              <label class="form-check-label" for="modeType">Type name</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="parent_mode" id="modeSelect" value="select" <%= hasParent ? 'checked' : '' %>>
+              <label class="form-check-label" for="modeSelect">Select registered parent</label>
+            </div>
+          </div>
+          <div id="typeField">
+            <input type="text" name="guardian_name" id="guardianNameInput" value="<%= student ? student.guardian_name || '' : '' %>" class="form-control" placeholder="e.g. John Davis">
+          </div>
+          <div id="selectField" style="display:<%= hasParent ? 'block' : 'none' %>">
+            <select name="parent_user_id" id="parentSelect" class="form-select">
+              <option value="">— None —</option>
+              <% parents.forEach(p => { %>
+                <option value="<%= p.id %>" data-name="<%= p.name %>" <%= student && student.parent_user_id == p.id ? 'selected' : '' %>><%= p.name %> (<%= p.email %>)</option>
+              <% }) %>
+            </select>
+          </div>
         </div>
         <div class="col-md-4">
           <label class="form-label">Class (enroll)</label>
@@ -69,3 +85,33 @@
     </form>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const modeType = document.getElementById('modeType');
+  const modeSelect = document.getElementById('modeSelect');
+  const typeField = document.getElementById('typeField');
+  const selectField = document.getElementById('selectField');
+  const parentSelect = document.getElementById('parentSelect');
+  const guardianInput = document.getElementById('guardianNameInput');
+
+  function toggle() {
+    if (modeType.checked) {
+      typeField.style.display = 'block';
+      selectField.style.display = 'none';
+      parentSelect.value = '';
+    } else {
+      typeField.style.display = 'none';
+      selectField.style.display = 'block';
+      guardianInput.value = '';
+    }
+  }
+  modeType.addEventListener('change', toggle);
+  modeSelect.addEventListener('change', toggle);
+
+  parentSelect.addEventListener('change', function() {
+    const opt = parentSelect.options[parentSelect.selectedIndex];
+    if (opt && opt.dataset.name) guardianInput.value = opt.dataset.name;
+  });
+});
+</script>

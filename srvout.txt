@@ -1,0 +1,3 @@
+[mailer] SMTP not configured - emails will be logged to console only.
+[db] MySQL connection OK.
+[server] Opportunity School Management System running at http://localhost:3000

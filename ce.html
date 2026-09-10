@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Class | Opportunity School Management System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+  <!-- If the current user is logged in, show the app shell -->
+  
+    <div class="d-md-flex">
+      <aside class="sidebar">
+  <div class="brand">
+    <img src="/images/logo.jpg" alt="Opportunity School" class="brand-logo">
+    Opportunity School
+    <span class="badge-role">
+      Administrator
+    </span>
+  </div>
+
+  <nav>
+    
+      <a href="/admin" class=""><span class="ico"><i class="bi bi-speedometer2"></i></span> Dashboard</a>
+      <a href="/admin/applications" class=""><span class="ico"><i class="bi bi-clipboard-check"></i></span> Applications</a>
+      <a href="/admin/students" class=""><span class="ico"><i class="bi bi-people"></i></span> Students</a>
+      <a href="/admin/teachers" class=""><span class="ico"><i class="bi bi-person-workspace"></i></span> Teachers &amp; Staff</a>
+      <a href="/admin/classes" class="active"><span class="ico"><i class="bi bi-bank"></i></span> Classes</a>
+      <a href="/admin/subjects" class=""><span class="ico"><i class="bi bi-book"></i></span> Subjects</a>
+      <a href="/admin/assignments" class=""><span class="ico"><i class="bi bi-link-45deg"></i></span> Assignments</a>
+      <a href="/admin/academic-years" class=""><span class="ico"><i class="bi bi-calendar3"></i></span> Years &amp; Terms</a>
+      <a href="/admin/exams" class=""><span class="ico"><i class="bi bi-file-earmark-text"></i></span> Examinations</a>
+      <a href="/admin/attendance" class=""><span class="ico"><i class="bi bi-calendar-check"></i></span> Attendance</a>
+      <a href="/admin/results" class=""><span class="ico"><i class="bi bi-graph-up"></i></span> Results</a>
+      <a href="/admin/messages" class=""><span class="ico"><i class="bi bi-envelope"></i></span> Messages</a>
+      <a href="/admin/reports" class=""><span class="ico"><i class="bi bi-file-bar-graph"></i></span> Reports</a>
+      <a href="/admin/logs" class=""><span class="ico"><i class="bi bi-journal-text"></i></span> Activity Logs</a>
+    
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="mb-1">System Admin</div>
+    <form action="/auth/logout" method="POST" class="d-inline">
+      <button class="btn btn-sm btn-outline-light">Log out</button>
+    </form>
+  </div>
+</aside>
+      <div class="main-area">
+        <header class="topbar">
+  <div>
+    <img src="/images/logo.jpg" alt="Opportunity School" class="topbar-logo">
+  </div>
+  <div class="d-flex align-items-center gap-3">
+    <span class="badge badge-soft-primary d-none d-md-inline" title="Active academic period">
+      <i class="bi bi-calendar3 me-1"></i>2025 · term 1
+    </span>
+    <span class="text-muted small d-none d-md-inline"><i class="bi bi-person-circle me-1"></i>System Admin</span>
+    <form action="/auth/logout" method="POST" class="d-inline">
+      <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-box-arrow-right"></i> Log out</button>
+    </form>
+  </div>
+</header>
+        <div class="content">
+          
+  
+  
+
+          <div class="mb-3">
+  <a href="/admin/classes" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+</div>
+
+<div class="card">
+  <div class="card-header">Edit Class</div>
+  <div class="card-body">
+    <form action="/admin/classes/1" method="POST">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Class name *</label>
+          <input type="text" name="name" value="Grade 5" class="form-control" placeholder="e.g. Grade 5" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Section</label>
+          <input type="text" name="section" value="A" class="form-control" placeholder="e.g. A">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Description</label>
+          <textarea name="description" class="form-control" rows="3"></textarea>
+        </div>
+
+        <div class="col-12">
+          <hr class="my-1">
+          <label class="form-label">Class teacher</label>
+          <select name="teacher_id" class="form-select">
+            <option value="">— no teacher —</option>
+            
+              <option value="8" >erick daniel</option>
+            
+              <option value="1" selected>John Smith</option>
+            
+              <option value="9" >odilia milambo</option>
+            
+              <option value="5" >redempta kiala</option>
+            
+              <option value="6" >scholastica kiala</option>
+            
+              <option value="7" >sylvanus samwli</option>
+            
+          </select>
+          <div class="form-text">The class teacher (homeroom) can confirm the term results and send them to the admin.</div>
+        </div>
+
+        <div class="col-12">
+          <hr class="my-1">
+          <label class="form-label">Subjects taught in this class &amp; their teachers</label>
+          <table class="table table-sm align-middle assign-table">
+            <thead><tr><th style="width:45%">Subject</th><th style="width:45%">Teacher</th><th style="width:10%"></th></tr></thead>
+            <tbody id="subjectRows">
+              
+                <tr>
+                  <td>
+                    <select name="subject_id[]" class="form-select form-select-sm">
+                      <option value="11" >civics</option><option value="5" selected>Computer Studies</option><option value="2" >English</option><option value="9" >geography</option><option value="10" >History</option><option value="7" >kiswahili</option><option value="1" >Mathematics</option><option value="3" >Science</option><option value="4" >Social Studies</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select name="subject_teacher_id[]" class="form-select form-select-sm">
+                      <option value="8" >erick daniel</option><option value="1" selected>John Smith</option><option value="9" >odilia milambo</option><option value="5" >redempta kiala</option><option value="6" >scholastica kiala</option><option value="7" >sylvanus samwli</option>
+                    </select>
+                  </td>
+                  <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()">&times;</button></td>
+                </tr>
+              
+                <tr>
+                  <td>
+                    <select name="subject_id[]" class="form-select form-select-sm">
+                      <option value="11" >civics</option><option value="5" >Computer Studies</option><option value="2" selected>English</option><option value="9" >geography</option><option value="10" >History</option><option value="7" >kiswahili</option><option value="1" >Mathematics</option><option value="3" >Science</option><option value="4" >Social Studies</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select name="subject_teacher_id[]" class="form-select form-select-sm">
+                      <option value="8" >erick daniel</option><option value="1" selected>John Smith</option><option value="9" >odilia milambo</option><option value="5" >redempta kiala</option><option value="6" >scholastica kiala</option><option value="7" >sylvanus samwli</option>
+                    </select>
+                  </td>
+                  <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()">&times;</button></td>
+                </tr>
+              
+                <tr>
+                  <td>
+                    <select name="subject_id[]" class="form-select form-select-sm">
+                      <option value="11" >civics</option><option value="5" >Computer Studies</option><option value="2" >English</option><option value="9" >geography</option><option value="10" >History</option><option value="7" >kiswahili</option><option value="1" selected>Mathematics</option><option value="3" >Science</option><option value="4" >Social Studies</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select name="subject_teacher_id[]" class="form-select form-select-sm">
+                      <option value="8" >erick daniel</option><option value="1" selected>John Smith</option><option value="9" >odilia milambo</option><option value="5" >redempta kiala</option><option value="6" >scholastica kiala</option><option value="7" >sylvanus samwli</option>
+                    </select>
+                  </td>
+                  <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()">&times;</button></td>
+                </tr>
+              
+                <tr>
+                  <td>
+                    <select name="subject_id[]" class="form-select form-select-sm">
+                      <option value="11" >civics</option><option value="5" >Computer Studies</option><option value="2" >English</option><option value="9" >geography</option><option value="10" >History</option><option value="7" >kiswahili</option><option value="1" >Mathematics</option><option value="3" selected>Science</option><option value="4" >Social Studies</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select name="subject_teacher_id[]" class="form-select form-select-sm">
+                      <option value="8" >erick daniel</option><option value="1" selected>John Smith</option><option value="9" >odilia milambo</option><option value="5" >redempta kiala</option><option value="6" >scholastica kiala</option><option value="7" >sylvanus samwli</option>
+                    </select>
+                  </td>
+                  <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()">&times;</button></td>
+                </tr>
+              
+                <tr>
+                  <td>
+                    <select name="subject_id[]" class="form-select form-select-sm">
+                      <option value="11" >civics</option><option value="5" >Computer Studies</option><option value="2" >English</option><option value="9" >geography</option><option value="10" >History</option><option value="7" >kiswahili</option><option value="1" >Mathematics</option><option value="3" >Science</option><option value="4" selected>Social Studies</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select name="subject_teacher_id[]" class="form-select form-select-sm">
+                      <option value="8" >erick daniel</option><option value="1" selected>John Smith</option><option value="9" >odilia milambo</option><option value="5" >redempta kiala</option><option value="6" >scholastica kiala</option><option value="7" >sylvanus samwli</option>
+                    </select>
+                  </td>
+                  <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()">&times;</button></td>
+                </tr>
+              
+            </tbody>
+          </table>
+          <button type="button" class="btn btn-sm btn-outline-secondary" id="addSubjectRow"><i class="bi bi-plus-lg"></i> Add subject</button>
+          <div class="form-text">Each subject teacher will be able to enter marks for the subject they teach in this class.</div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Add students to this class</label>
+          <div class="border rounded p-2 student-pick">
+            
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="student_ids[]" value="1" id="st1"
+                  checked>
+                <label class="form-check-label small" for="st1">Emma Davis <span class="text-muted">(S-2024-0001)</span></label>
+              </div>
+            
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="student_ids[]" value="5" id="st5"
+                  >
+                <label class="form-check-label small" for="st5">Sophie Davis <span class="text-muted">(S-2026-8754)</span></label>
+              </div>
+            
+            
+          </div>
+        </div>
+
+        <div class="col-12">
+          <button class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const SUBJECTS = [{"id":11,"name":"civics"},{"id":5,"name":"Computer Studies"},{"id":2,"name":"English"},{"id":9,"name":"geography"},{"id":10,"name":"History"},{"id":7,"name":"kiswahili"},{"id":1,"name":"Mathematics"},{"id":3,"name":"Science"},{"id":4,"name":"Social Studies"}];
+  const TEACHERS = [{"id":8,"name":"erick daniel"},{"id":1,"name":"John Smith"},{"id":9,"name":"odilia milambo"},{"id":5,"name":"redempta kiala"},{"id":6,"name":"scholastica kiala"},{"id":7,"name":"sylvanus samwli"}];
+  function subjectRowHTML(sub, teacher) {
+    const su = SUBJECTS.map(function (s) {
+      return '<option value="' + s.id + '"' + (String(s.id) === String(sub) ? ' selected' : '') + '>' + s.name + '</option>';
+    }).join('');
+    const te = TEACHERS.map(function (t) {
+      return '<option value="' + t.id + '"' + (String(t.id) === String(teacher) ? ' selected' : '') + '>' + t.name + '</option>';
+    }).join('');
+    return '<tr>' +
+      '<td><select name="subject_id[]" class="form-select form-select-sm">' + su + '</select></td>' +
+      '<td><select name="subject_teacher_id[]" class="form-select form-select-sm">' + te + '</select></td>' +
+      '<td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest(\'tr\').remove()">&times;</button></td>' +
+      '</tr>';
+  }
+  document.getElementById('addSubjectRow').addEventListener('click', function () {
+    document.getElementById('subjectRows').insertAdjacentHTML('beforeend', subjectRowHTML('', ''));
+  });
+</script>
+        </div>
+      </div>
+    </div>
+  
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

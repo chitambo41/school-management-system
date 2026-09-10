@@ -33,4 +33,8 @@ router.get('/results', c.results);
 router.get('/class-results', c.classResults);
 router.post('/class-results/:classId/send', c.classResultsSend);
 
+// Messages
+router.get('/messages', c.messages);
+router.get('/messages/:id', c.messageRead);
+
 module.exports = router;

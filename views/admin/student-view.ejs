@@ -27,7 +27,7 @@
           <dt>Enrolled</dt><dd><%= fmtDate(student.enrollment_date) %></dd>
           <dt>Address</dt><dd><%= student.address || '—' %></dd>
           <dt>Previous school</dt><dd><%= student.previous_school || '—' %></dd>
-          <dt>Parent/Guardian</dt><dd><%= student.parent_name + (student.parent_email ? ' <' + student.parent_email + '>' : '') %></dd>
+          <dt>Parent/Guardian</dt><dd><%= student.parent_name || student.guardian_name || '—' %><% if (student.parent_email) { %> &lt;<%= student.parent_email %>&gt;<% } %></dd>
         </dl>
       </div>
     </div>

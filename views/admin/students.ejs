@@ -42,7 +42,7 @@
               <td><%= s.class_name || '—' %></td>
               <td><%= s.class_teacher || '—' %></td>
               <td class="text-capitalize"><%= s.gender %></td>
-              <td class="small"><%= s.parent_name || '—' %></td>
+              <td class="small"><%= s.parent_name || s.guardian_name || '—' %></td>
               <td><span class="badge <%= s.status === 'active' ? 'badge-soft-success' : 'badge-soft-muted' %>"><%= s.status %></span></td>
               <td class="text-end">
                 <a href="/admin/students/<%= s.id %>" class="btn btn-sm btn-outline-primary">Profile</a>

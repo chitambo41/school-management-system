@@ -202,40 +202,87 @@ exports.results = asyncHandler(async (req, res) => {
   const [children] = await db.query(
     'SELECT id, name, report_approved_at FROM students WHERE parent_user_id=? AND deleted_at IS NULL AND status="active" ORDER BY name', [req.user.id]);
   const childId = req.query.child || (children.length ? children[0].id : null);
-  const termId = req.query.term || '';
 
   let terms = [];
   let marks = [];
   let total = 0, max = 0;
   let reportApproved = false;
+  let termId = '';
+  let className = '', classTeacher = '';
+  let position = 0, totalStudents = 0, overallGrade = '';
+  let teacherComment = '', studentName = '', admissionNo = '';
 
   if (childId) {
-    // Ensure ownership
-    const [own] = await db.query('SELECT id, report_approved_at FROM students WHERE id=? AND parent_user_id=?', [childId, req.user.id]);
+    const [own] = await db.query('SELECT id, name, admission_no, report_approved_at FROM students WHERE id=? AND parent_user_id=?', [childId, req.user.id]);
     if (own.length) {
       reportApproved = !!own[0].report_approved_at;
+      studentName = own[0].name;
+      admissionNo = own[0].admission_no;
+
+      // Class info for this child
+      const [clsInfo] = await db.query(
+        `SELECT c.name AS class_name, u.name AS teacher_name
+         FROM student_class_enrollments sce
+         JOIN classes c ON c.id=sce.class_id
+         JOIN terms t ON t.id=sce.term_id JOIN academic_years ay ON ay.id=t.academic_year_id
+         LEFT JOIN class_teacher_assignments cta ON cta.class_id=sce.class_id AND cta.subject_id IS NULL
+         LEFT JOIN teachers te ON te.id=cta.teacher_id LEFT JOIN users u ON u.id=te.user_id
+         WHERE sce.student_id=? AND ay.is_active=1 ORDER BY sce.id DESC LIMIT 1`, [childId]);
+      if (clsInfo.length) {
+        className = clsInfo[0].class_name;
+        classTeacher = clsInfo[0].teacher_name || '';
+      }
+
       [terms] = await db.query(
         `SELECT DISTINCT t.id, t.name, ay.name AS year FROM marks m
          JOIN examinations e ON e.id=m.exam_id JOIN terms t ON t.id=e.term_id
          JOIN academic_years ay ON ay.id=t.academic_year_id
          WHERE m.student_id=? ORDER BY t.id`, [childId]);
-      const activeTerm = termId || (terms.length ? terms[0].id : null);
-      if (activeTerm) {
+      termId = req.query.term || (terms.length ? terms[0].id : '');
+      if (termId) {
         [marks] = await db.query(
           `SELECT m.marks_obtained, m.grade, m.remarks, e.max_marks, e.name AS exam_name, sub.name AS subject_name
            FROM marks m JOIN examinations e ON e.id=m.exam_id AND e.term_id=?
            JOIN subjects sub ON sub.id=m.subject_id
-           WHERE m.student_id=? ORDER BY sub.name`, [activeTerm, childId]);
+           WHERE m.student_id=? ORDER BY sub.name`, [termId, childId]);
         marks.forEach(m => {
           total += parseFloat(m.marks_obtained);
           max += m.max_marks;
           m.grade = gradeFor(m.marks_obtained, m.max_marks);
         });
+        overallGrade = gradeFor(total, max);
+
+        // Position
+        if (className) {
+          const [rankRows] = await db.query(
+            `SELECT s.id, SUM(m.marks_obtained) AS total_obtained, SUM(e.max_marks) AS total_max
+             FROM students s
+             JOIN student_class_enrollments sce ON sce.student_id=s.id
+             JOIN terms t ON t.id=sce.term_id JOIN academic_years ay ON ay.id=t.academic_year_id
+             JOIN classes c ON c.id=sce.class_id
+             JOIN marks m ON m.student_id=s.id
+             JOIN examinations e ON e.id=m.exam_id AND e.term_id=?
+             WHERE c.name=? AND s.deleted_at IS NULL AND s.status='active'
+             GROUP BY s.id ORDER BY (SUM(m.marks_obtained)/SUM(e.max_marks)) DESC`, [termId, className]);
+          totalStudents = rankRows.length;
+          const idx = rankRows.findIndex(r => String(r.id) === String(childId));
+          position = idx >= 0 ? idx + 1 : 0;
+        }
+
+        // Teacher comment
+        const [tc] = await db.query(
+          `SELECT tc.comment FROM teacher_comments tc
+           WHERE tc.student_id=? AND tc.term_id=? LIMIT 1`, [childId, termId]);
+        if (tc.length) teacherComment = tc[0].comment;
       }
     }
   }
 
-  res.render('parent/results', { title: 'Results', children, childId, termId, terms, marks, total, max, reportApproved, active: 'results' });
+  res.render('parent/results', {
+    title: 'Report Card', children, childId, termId, terms, marks, total, max, reportApproved,
+    className, classTeacher, position, totalStudents, overallGrade, teacherComment,
+    studentName, admissionNo, active: 'results'
+  });
 });
 
 // ============================================================
