@@ -236,4 +236,5 @@ See the comments inside each controller for pointers on where to add things.
 | `ER_BAD_DB_ERROR` | Run `npm run db:init` first |
 | Port already in use | Change `PORT` in `.env` |
 | Emails not sending | SMTP vars are blank → check server console where emails are logged, or configure `SMTP_*` |
-| Can't login as admin | Confirm you ran `seed.sql` |
+| Can't login as admin | Confirm you ran `seed.sql` |#   s c h o o l - m a n a g e m e n t -  
+ 
