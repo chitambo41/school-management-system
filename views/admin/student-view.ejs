@@ -1,0 +1,73 @@
+<div class="mb-3 d-flex justify-content-between">
+  <a href="/admin/students" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+  <div>
+    <a href="/admin/students/<%= student.id %>/report" class="btn btn-sm btn-primary"><i class="bi bi-file-earmark-text"></i> Report</a>
+    <a href="/admin/students/<%= student.id %>/edit" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i> Edit</a>
+    <form action="/admin/students/<%= student.id %>/delete" method="POST" class="d-inline" onsubmit="return confirmDelete('Delete this student?')">
+      <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Delete</button>
+    </form>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="display-5 mb-2"><i class="bi bi-person-circle text-primary"></i></div>
+        <h5 class="mb-0"><%= student.name %></h5>
+        <div class="text-muted small"><%= student.admission_no %></div>
+        <div class="mt-2">
+          <% if (student.status !== 'active') { %><span class="badge badge-soft-muted text-capitalize"><%= student.status %></span><% } %>
+          <% if (student.status === 'active') { %><span class="badge badge-soft-success">Active</span><% } %>
+        </div>
+        <hr>
+        <dl class="text-start small mb-0">
+          <dt>Date of birth</dt><dd><%= fmtDate(student.date_of_birth) %></dd>
+          <dt>Gender</dt><dd class="text-capitalize"><%= student.gender %></dd>
+          <dt>Enrolled</dt><dd><%= fmtDate(student.enrollment_date) %></dd>
+          <dt>Address</dt><dd><%= student.address || '—' %></dd>
+          <dt>Previous school</dt><dd><%= student.previous_school || '—' %></dd>
+          <dt>Parent/Guardian</dt><dd><%= student.parent_name + (student.parent_email ? ' <' + student.parent_email + '>' : '') %></dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card mb-4">
+      <div class="card-header">Class Enrollments</div>
+      <div class="card-body p-0">
+        <table class="table mb-0 small">
+          <thead><tr><th>Class</th><th>Term</th></tr></thead>
+          <tbody>
+            <% if (enrollments.length === 0) { %><tr><td colspan="2" class="text-muted">No enrollments.</td></tr><% } %>
+            <% enrollments.forEach(e => { %>
+              <tr><td><%= e.class_name %></td><td><%= e.term_name %></td></tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Exam Results</div>
+      <div class="card-body p-0">
+        <table class="table mb-0 small">
+          <thead><tr><th>Subject</th><th>Exam</th><th>Marks</th><th>Grade</th><th>Remarks</th></tr></thead>
+          <tbody>
+            <% if (marks.length === 0) { %><tr><td colspan="5" class="text-muted">No results recorded.</td></tr><% } %>
+            <% marks.forEach(m => { %>
+              <tr>
+                <td><%= m.subject_name %></td>
+                <td><%= m.exam_name %></td>
+                <td><%= m.marks_obtained %></td>
+                <td><span class="badge badge-soft-primary"><%= m.grade || '—' %></span></td>
+                <td><%= m.remarks || '—' %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,48 @@
+<aside class="sidebar">
+  <div class="brand">
+    <img src="/images/logo.jpg" alt="Opportunity School" class="brand-logo">
+    Opportunity School
+    <span class="badge-role">
+      <%= currentUser.role === 'admin' ? 'Administrator' : (currentUser.role === 'teacher' ? 'Teacher' : 'Parent / Guardian') %>
+    </span>
+  </div>
+
+  <nav>
+    <% if (currentUser.role === 'admin') { %>
+      <a href="/admin" class="<%= active === 'dashboard' ? 'active' : '' %>"><span class="ico"><i class="bi bi-speedometer2"></i></span> Dashboard</a>
+      <a href="/admin/applications" class="<%= active === 'applications' ? 'active' : '' %>"><span class="ico"><i class="bi bi-clipboard-check"></i></span> Applications</a>
+      <a href="/admin/students" class="<%= active === 'students' ? 'active' : '' %>"><span class="ico"><i class="bi bi-people"></i></span> Students</a>
+      <a href="/admin/teachers" class="<%= active === 'teachers' ? 'active' : '' %>"><span class="ico"><i class="bi bi-person-workspace"></i></span> Teachers &amp; Staff</a>
+      <a href="/admin/classes" class="<%= active === 'classes' ? 'active' : '' %>"><span class="ico"><i class="bi bi-bank"></i></span> Classes</a>
+      <a href="/admin/subjects" class="<%= active === 'subjects' ? 'active' : '' %>"><span class="ico"><i class="bi bi-book"></i></span> Subjects</a>
+      <a href="/admin/assignments" class="<%= active === 'assignments' ? 'active' : '' %>"><span class="ico"><i class="bi bi-link-45deg"></i></span> Assignments</a>
+      <a href="/admin/academic-years" class="<%= active === 'academic' ? 'active' : '' %>"><span class="ico"><i class="bi bi-calendar3"></i></span> Years &amp; Terms</a>
+      <a href="/admin/exams" class="<%= active === 'exams' ? 'active' : '' %>"><span class="ico"><i class="bi bi-file-earmark-text"></i></span> Examinations</a>
+      <a href="/admin/attendance" class="<%= active === 'attendance' ? 'active' : '' %>"><span class="ico"><i class="bi bi-calendar-check"></i></span> Attendance</a>
+      <a href="/admin/results" class="<%= active === 'marks' ? 'active' : '' %>"><span class="ico"><i class="bi bi-graph-up"></i></span> Results</a>
+      <a href="/admin/messages" class="<%= active === 'messages' ? 'active' : '' %>"><span class="ico"><i class="bi bi-envelope"></i></span> Messages</a>
+      <a href="/admin/reports" class="<%= active === 'reports' ? 'active' : '' %>"><span class="ico"><i class="bi bi-file-bar-graph"></i></span> Reports</a>
+      <a href="/admin/logs" class="<%= active === 'logs' ? 'active' : '' %>"><span class="ico"><i class="bi bi-journal-text"></i></span> Activity Logs</a>
+    <% } else if (currentUser.role === 'teacher') { %>
+      <a href="/teacher" class="<%= active === 'dashboard' ? 'active' : '' %>"><span class="ico"><i class="bi bi-speedometer2"></i></span> Dashboard</a>
+      <a href="/teacher/classes" class="<%= active === 'classes' ? 'active' : '' %>"><span class="ico"><i class="bi bi-bank"></i></span> My Classes</a>
+      <a href="/teacher/results" class="<%= active === 'results' ? 'active' : '' %>"><span class="ico"><i class="bi bi-graph-up"></i></span> Results &amp; Progress</a>
+      <a href="/teacher/class-results" class="<%= active === 'confirm' ? 'active' : '' %>"><span class="ico"><i class="bi bi-send-check"></i></span> Confirm Results</a>
+    <% } else { %>
+      <a href="/parent/dashboard" class="<%= active === 'dashboard' ? 'active' : '' %>"><span class="ico"><i class="bi bi-speedometer2"></i></span> Dashboard</a>
+      <a href="/parent/apply" class="<%= active === 'apply' ? 'active' : '' %>"><span class="ico"><i class="bi bi-clipboard-plus"></i></span> Apply for Admission</a>
+      <a href="/parent/applications" class="<%= active === 'applications' ? 'active' : '' %>"><span class="ico"><i class="bi bi-clipboard-check"></i></span> My Applications</a>
+      <a href="/parent/children" class="<%= active === 'children' ? 'active' : '' %>"><span class="ico"><i class="bi bi-people"></i></span> My Children</a>
+      <a href="/parent/results" class="<%= active === 'results' ? 'active' : '' %>"><span class="ico"><i class="bi bi-graph-up"></i></span> Results</a>
+      <a href="/parent/progress" class="<%= active === 'progress' ? 'active' : '' %>"><span class="ico"><i class="bi bi-bar-chart"></i></span> Academic Progress</a>
+      <a href="/parent/messages" class="<%= active === 'messages' ? 'active' : '' %>"><span class="ico"><i class="bi bi-envelope"></i></span> Messages</a>
+    <% } %>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="mb-1"><%= currentUser.name %></div>
+    <form action="/auth/logout" method="POST" class="d-inline">
+      <button class="btn btn-sm btn-outline-light">Log out</button>
+    </form>
+  </div>
+</aside>

@@ -1,0 +1,109 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold mb-0"><i class="bi bi-speedometer2 me-2"></i>Parent Dashboard</h4>
+  <span class="text-muted small">Welcome, <%= currentUser.name %></span>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="stat-card stat-blue">
+      <i class="bi bi-people fs-2"></i>
+      <div><div class="num"><%= children.length %></div><div class="lbl">Children enrolled</div></div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card stat-green">
+      <i class="bi bi-clipboard-check fs-2"></i>
+      <div><div class="num"><%= applications.length %></div><div class="lbl">Applications</div></div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card stat-orange">
+      <i class="bi bi-envelope fs-2"></i>
+      <div><div class="num"><%= messages.length %></div><div class="lbl">Recent messages</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="card">
+      <div class="card-header">My Children</div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead><tr><th>Name</th><th>Class</th><th>Class teacher</th><th></th></tr></thead>
+          <tbody>
+            <% if (children.length === 0) { %>
+              <tr><td colspan="4" class="text-center text-muted py-4">No children enrolled yet.<br>Use "Apply for Admission" to get started.</td></tr>
+            <% } %>
+            <% children.forEach(c => { %>
+              <tr>
+                <td class="fw-semibold"><%= c.name %></td>
+                <td><%= c.class_name || 'Not assigned' %></td>
+                <td class="small">
+                  <%= c.class_teacher || '—' %>
+                  <% if (c.class_teacher_phone) { %>
+                    <div><a href="tel:<%= c.class_teacher_phone %>" class="text-decoration-none"><i class="bi bi-telephone"></i> <%= c.class_teacher_phone %></a></div>
+                  <% } %>
+                </td>
+                <td class="text-end"><a href="/parent/children/<%= c.id %>" class="btn btn-sm btn-outline-primary">Profile</a></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="card mb-4">
+      <div class="card-header">Recent Applications</div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead><tr><th>Student</th><th>Grade</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>
+            <% if (applications.length === 0) { %><tr><td colspan="4" class="text-center text-muted py-4">No applications.</td></tr><% } %>
+            <% applications.forEach(a => { %>
+              <tr>
+                <td><%= a.student_name %></td>
+                <td><%= a.grade_applying %></td>
+                <td>
+                  <% if (a.status === 'approved') { %><span class="badge badge-soft-success">Approved</span><% } %>
+                  <% if (a.status === 'pending') { %><span class="badge badge-soft-warning">Pending</span><% } %>
+                  <% if (a.status === 'rejected') { %><span class="badge badge-soft-danger">Rejected</span><% } %>
+                </td>
+                <td class="small text-muted"><%= fmtDate(a.created_at) %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        Recent Messages
+        <a href="/parent/messages" class="btn btn-sm btn-outline-primary">View all</a>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead><tr><th>Subject</th><th>Read</th><th>Date</th></tr></thead>
+          <tbody>
+            <% if (messages.length === 0) { %><tr><td colspan="3" class="text-center text-muted py-4">No messages.</td></tr><% } %>
+            <% messages.forEach(m => { %>
+              <tr>
+                <td>
+                  <a href="/parent/messages/<%= m.id %>" class="text-decoration-none <%= !m.is_read ? 'fw-bold' : '' %>"><%= m.subject %></a>
+                </td>
+                <td>
+                  <% if (m.is_read) { %><span class="badge badge-soft-muted">Read</span><% } %>
+                  <% if (!m.is_read) { %><span class="badge badge-soft-primary">New</span><% } %>
+                </td>
+                <td class="small text-muted"><%= fmtDate(m.created_at) %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

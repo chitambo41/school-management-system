@@ -1,0 +1,1 @@
+﻿const { buildTermResults } = require('./middleware/helpers'); buildTermResults(1,1).then(({ cls, rows }) => { console.log('cls', cls && cls.name, 'rows', rows.map(r => ({ id: r.id, name: r.name, hasMarks: r.hasMarks, total: r.total }))); }).catch(e => console.log('ERR', e.message));

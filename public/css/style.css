@@ -1,0 +1,197 @@
+/* =====================================================
+   School Management System - Global styles
+   ===================================================== */
+:root {
+  --brand: #2563eb;
+  --brand-dark: #1d4ed8;
+  --bg: #f4f6fb;
+  --sidebar-bg: #101c33;
+  --sidebar-text: #cbd5e1;
+  --sidebar-hover: #1e293b;
+  --text: #1e293b;
+  --muted: #64748b;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* ---------- Public (login/register) pages ---------- */
+.auth-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  padding: 1rem;
+}
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 20px 50px rgba(0,0,0,.25);
+  overflow: hidden;
+}
+.auth-header {
+  background: var(--brand);
+  color: #fff;
+  padding: 1.75rem 2rem;
+}
+.auth-header h4 { margin: 0; font-weight: 700; }
+.auth-header p { margin: 0.25rem 0 0; opacity: .85; font-size: .9rem; }
+.auth-body { padding: 2rem; }
+.auth-logo {
+  display: block;
+  height: 56px;
+  width: auto;
+  margin: 0 auto .75rem;
+  padding: 4px;
+  background: #fff;
+  border-radius: 10px;
+}
+
+/* ---------- App shell (protected pages) ---------- */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 260px;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  z-index: 100;
+}
+.sidebar .brand {
+  padding: 1rem 1.25rem;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+}
+.brand-logo {
+  height: 32px;
+  width: auto;
+  border-radius: 6px;
+  background: #fff;
+  padding: 2px;
+}
+.student-pick {
+  max-height: 220px;
+  overflow-y: auto;
+}
+.topbar-logo {
+  height: 40px;
+  width: auto;
+  border-radius: 6px;
+  background: #fff;
+  padding: 2px;
+}
+.sidebar .brand .badge-role {
+  display: block;
+  flex-basis: 100%;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: #93c5fd;
+  font-weight: 600;
+  margin-top: 4px;
+}
+.sidebar nav a {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  padding: .7rem 1.25rem;
+  color: var(--sidebar-text);
+  text-decoration: none;
+  font-size: .92rem;
+  border-left: 3px solid transparent;
+  transition: all .15s;
+}
+.sidebar nav a:hover { background: var(--sidebar-hover); color: #fff; }
+.sidebar nav a.active { background: var(--sidebar-hover); border-left-color: var(--brand); color: #fff; }
+.sidebar nav a .ico { width: 20px; text-align: center; }
+.sidebar .sidebar-footer {
+  margin-top: auto;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid rgba(255,255,255,.08);
+  font-size: .8rem;
+}
+
+.main-area { margin-left: 260px; min-height: 100vh; display: flex; flex-direction: column; }
+.topbar {
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: .9rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.content { padding: 1.5rem; flex: 1; }
+
+/* ---------- Cards & tables ---------- */
+.card { border: 0; box-shadow: 0 1px 3px rgba(0,0,0,.08); border-radius: .75rem; }
+.card-header { border-radius: .75rem .75rem 0 0 !important; background: #fff; font-weight: 600; }
+.stat-card { border-radius: .9rem; color: #fff; padding: 1.25rem; display: flex; align-items: center; gap: 1rem; }
+.stat-card .num { font-size: 1.9rem; font-weight: 700; line-height: 1; }
+.stat-card .lbl { opacity: .9; font-size: .85rem; }
+.stat-blue { background: linear-gradient(135deg,#2563eb,#3b82f6); }
+.stat-green { background: linear-gradient(135deg,#059669,#10b981); }
+.stat-purple { background: linear-gradient(135deg,#7c3aed,#8b5cf6); }
+.stat-orange { background: linear-gradient(135deg,#d97706,#f59e0b); }
+
+.table thead th { border-bottom: 2px solid #e2e8f0; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.table td, .table th { vertical-align: middle; }
+
+.badge-soft-success { background:#d1fae5; color:#065f46; }
+.badge-soft-warning { background:#fef3c7; color:#92400e; }
+.badge-soft-danger  { background:#fee2e2; color:#991b1b; }
+.badge-soft-primary { background:#dbeafe; color:#1e40af; }
+.badge-soft-muted   { background:#e2e8f0; color:#475569; }
+
+/* ---------- Login card role hint ---------- */
+.demo-hint {
+  background: #eff6ff;
+  border: 1px dashed #93c5fd;
+  border-radius: .5rem;
+  padding: .75rem 1rem;
+  font-size: .85rem;
+  color: #1e40af;
+}
+
+/* ---------- Navbar on public pages ---------- */
+.public-nav { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+.hero { padding: 4rem 0 3rem; }
+.hero h1 { font-weight: 800; }
+.feature-box { background:#fff; border-radius:.9rem; box-shadow:0 1px 3px rgba(0,0,0,.08); padding:1.5rem; }
+
+/* ---------- Mark entry inputs ---------- */
+.marks-input { width: 90px; }
+
+/* ---------- Mobile ---------- */
+@media (max-width: 991.98px) {
+  .sidebar { position: static; width: 100%; height: auto; flex-direction: column; }
+  .main-area { margin-left: 0; }
+  .sidebar-footer { display: none; }
+  .sm-hide { display: none !important; }
+}
+/* Print: hide shell, keep report content */
+@media print {
+  .sidebar, .topbar, .no-print { display: none !important; }
+  .d-md-flex { display: block !important; }
+  .main-area, .content { width: 100% !important; margin: 0 !important; padding: 0 !important; }
+  body { background: #fff !important; }
+  .card { border: 1px solid #ccc !important; box-shadow: none !important; }
+}

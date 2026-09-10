@@ -1,0 +1,38 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold mb-0"><i class="bi bi-bank me-2"></i>Classes</h4>
+  <a href="/admin/classes/new" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Add Class</a>
+</div>
+
+<div class="row g-3">
+  <% classes.forEach(c => { %>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <h5 class="mb-1"><%= c.name %> <span class="text-muted"><%= c.section || '' %></span></h5>
+              <div class="text-muted small mb-1"><%= c.student_count %> enrolled students</div>
+              <div class="small mb-2">
+                <% if (c.teacher_name) { %>
+                  <span class="badge badge-soft-primary"><i class="bi bi-person"></i> <%= c.teacher_name %></span>
+                <% } else { %>
+                  <span class="badge badge-soft-muted">No class teacher</span>
+                <% } %>
+              </div>
+              <div class="text-muted small"><%= c.description || 'No description' %></div>
+            </div>
+            <div class="d-flex gap-2">
+              <a href="/admin/classes/<%= c.id %>/edit" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+              <form action="/admin/classes/<%= c.id %>/delete" method="POST" onsubmit="return confirmDelete('Delete this class?')">
+                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% }) %>
+  <% if (classes.length === 0) { %>
+    <div class="col-12 text-center text-muted py-5">No classes yet. <a href="/admin/classes/new">Create one</a>.</div>
+  <% } %>
+</div>

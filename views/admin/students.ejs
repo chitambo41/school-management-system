@@ -1,0 +1,57 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold mb-0"><i class="bi bi-people me-2"></i>Students</h4>
+  <a href="/admin/students/new" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Add Student</a>
+</div>
+
+<form class="card card-body mb-3" action="/admin/students" method="GET">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-5">
+      <label class="form-label small">Search</label>
+      <input type="text" name="q" data-search="#studentTable" value="<%= search %>" class="form-control form-control-sm" placeholder="Search by name...">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label small">Class</label>
+      <select name="class" class="form-select form-select-sm" data-filter-form>
+        <option value="">All classes</option>
+        <% classes.forEach(c => { %>
+          <option value="<%= c.id %>" <%= classId == c.id ? 'selected' : '' %>><%= c.name %> <%= c.section || '' %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="col-md-3 d-flex gap-2">
+      <button class="btn btn-outline-primary btn-sm w-100">Filter</button>
+    </div>
+  </div>
+</form>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0" id="studentTable">
+        <thead>
+          <tr><th>Admission No</th><th>Name</th><th>Class</th><th>Class Teacher</th><th>Gender</th><th>Parent</th><th>Status</th><th></th></tr>
+        </thead>
+        <tbody>
+          <% if (students.length === 0) { %>
+            <tr><td colspan="8" class="text-center text-muted py-4">No students found.</td></tr>
+          <% } %>
+          <% students.forEach(s => { %>
+            <tr>
+              <td class="text-muted small"><%= s.admission_no %></td>
+              <td class="fw-semibold"><a href="/admin/students/<%= s.id %>" class="text-decoration-none"><%= s.name %></a></td>
+              <td><%= s.class_name || '—' %></td>
+              <td><%= s.class_teacher || '—' %></td>
+              <td class="text-capitalize"><%= s.gender %></td>
+              <td class="small"><%= s.parent_name || '—' %></td>
+              <td><span class="badge <%= s.status === 'active' ? 'badge-soft-success' : 'badge-soft-muted' %>"><%= s.status %></span></td>
+              <td class="text-end">
+                <a href="/admin/students/<%= s.id %>" class="btn btn-sm btn-outline-primary">Profile</a>
+                <a href="/admin/students/<%= s.id %>/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,116 @@
+<div class="mb-3">
+  <a href="/teacher" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+  <h4 class="fw-bold d-inline ms-2 mb-0">Confirm Term Results <span class="text-muted small fw-normal">(Class Teacher)</span></h4>
+</div>
+
+<div class="card card-body mb-3">
+  <form action="/teacher/class-results" method="GET" class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label small">Class (you are the class teacher)</label>
+      <select name="class" class="form-select form-select-sm" data-filter-form>
+        <% classes.forEach(c => { %>
+          <option value="<%= c.id %>" <%= String(classId) === String(c.id) ? 'selected' : '' %>><%= c.name %> <%= c.section || '' %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label small">Term</label>
+      <select name="term" class="form-select form-select-sm" data-filter-form>
+        <% terms.forEach(t => { %>
+          <option value="<%= t.id %>" <%= String(termId) === String(t.id) ? 'selected' : '' %>><%= t.name %> (<%= t.year %>)</option>
+        <% }) %>
+      </select>
+    </div>
+  </form>
+</div>
+
+<% if (!classes.length) { %>
+  <div class="text-center text-muted py-5">You are not the class teacher of any class yet. The admin assigns a class teacher when creating/editing a class.</div>
+<% } else if (!cls) { %>
+  <div class="text-center text-muted py-5">Class not found.</div>
+<% } else { %>
+
+  <div class="card mb-3 border-0 shadow-sm">
+    <div class="card-body py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <div>
+        <% if (!submission || submission.status === 'draft') { %>
+          <span class="badge badge-soft-muted">Not sent yet</span>
+          <div class="small text-muted mt-1">Review all marks below, then confirm and send to the admin.</div>
+        <% } else if (submission.status === 'submitted') { %>
+          <span class="badge badge-soft-warning">Sent to admin — awaiting review</span>
+          <div class="small text-muted mt-1">Submitted on <%= new Date(submission.submitted_at).toLocaleString() %>.</div>
+        <% } else if (submission.status === 'approved') { %>
+          <span class="badge badge-soft-success">Approved by admin</span>
+          <div class="small text-muted mt-1">Reviewed by <strong><%= submission.reviewed_by_name || 'admin' %></strong><% if (submission.reviewed_at) { %> on <%= new Date(submission.reviewed_at).toLocaleString() %><% } %>. Results cleared for printing.</div>
+        <% } else { %>
+          <span class="badge badge-soft-danger">Admin requested changes</span>
+          <% if (submission.admin_note) { %><div class="small text-muted mt-1"><strong>Note:</strong> <%= submission.admin_note %></div><% } %>
+          <div class="small text-muted mt-1">Update the marks, then confirm and send again.</div>
+        <% } %>
+      </div>
+      <div>
+        <% if (!submission || submission.status === 'draft' || submission.status === 'revision') { %>
+          <form action="/teacher/class-results/<%= classId %>/send" method="POST" class="d-inline">
+            <input type="hidden" name="term" value="<%= termId %>">
+            <button class="btn btn-primary"><i class="bi bi-send me-1"></i>Confirm &amp; Send to Admin</button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span><strong><%= cls.name %></strong> <%= cls.section || '' %> · Full term results</span>
+      <span class="small text-muted">Grading: A (81-100) &bull; B (61-80) &bull; C (41-60) &bull; D (21-40) &bull; F (0-20)</span>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-bordered mb-0 small text-center align-middle">
+          <thead>
+            <tr>
+              <th style="min-width:50px">Pos</th>
+              <th class="text-start" style="min-width:170px">Student</th>
+              <% subjects.forEach(su => { %>
+                <th><%= su.name %><br><span class="fw-normal text-muted" style="font-size:.72rem"><%= su.teacher_name || '' %></span></th>
+              <% }) %>
+              <th>Total</th>
+              <th>%</th>
+              <th>Grade</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (rows.length === 0) { %>
+              <tr><td colspan="<%= subjects.length + 5 %>" class="text-center text-muted py-4">No students enrolled in this class.</td></tr>
+            <% } %>
+            <% rows.slice().sort((a,b) => (a.position || 9999) - (b.position || 9999)).forEach(r => { %>
+              <tr>
+                <td>
+                  <% if (r.position) { %>
+                    <span class="badge <%= r.position === 1 ? 'badge-soft-success' : (r.position === 2 || r.position === 3 ? 'badge-soft-primary' : 'badge-soft-muted') %>">#<%= r.position %></span>
+                  <% } else { %>
+                    <span class="text-muted">—</span>
+                  <% } %>
+                </td>
+                <td class="text-start">
+                  <div class="fw-semibold"><%= r.name %></div>
+                  <div class="text-muted small"><%= r.admission_no %></div>
+                </td>
+                <% r.subjects.forEach(sub => { %>
+                  <% if (sub.obtained !== null) { %>
+                    <td><%= sub.pct %>% <span class="badge badge-soft-primary"><%= sub.grade %></span><br><span class="text-muted" style="font-size:.72rem"><%= sub.obtained %>/<%= sub.max %></span></td>
+                  <% } else { %>
+                    <td><span class="text-muted">—</span></td>
+                  <% } %>
+                <% }) %>
+                <td class="fw-bold"><%= r.total %></td>
+                <td><%= r.pct !== null ? r.pct + '%' : '—' %></td>
+                <td><% if (r.grade) { %><span class="badge badge-soft-success"><%= r.grade %></span><% } else { %><span class="text-muted">—</span><% } %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+<% } %>

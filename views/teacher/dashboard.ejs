@@ -1,0 +1,53 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold mb-0"><i class="bi bi-speedometer2 me-2"></i>Teacher Dashboard</h4>
+  <span class="text-muted small">Welcome, <%= currentUser.name %></span>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="stat-card stat-blue">
+      <i class="bi bi-bank fs-2"></i>
+      <div><div class="num"><%= stats.classes %></div><div class="lbl">Classes I teach</div></div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card stat-green">
+      <i class="bi bi-people fs-2"></i>
+      <div><div class="num"><%= stats.students %></div><div class="lbl">My students</div></div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card stat-orange">
+      <i class="bi bi-calendar-check fs-2"></i>
+      <div><div class="num"><%= stats.todayAttendance %></div><div class="lbl">Attendance records today</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">My Subjects & Classes</div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Class</th><th>Subject</th><th>Actions</th></tr></thead>
+        <tbody>
+          <% if (assignments.length === 0) { %>
+            <tr><td colspan="3" class="text-center text-muted py-4">You have not been assigned to any class yet. Please contact the admin.</td></tr>
+          <% } %>
+          <% assignments.forEach(a => { %>
+            <tr>
+              <td class="fw-semibold"><a href="/teacher/classes/<%= a.class_id %>" class="text-decoration-none"><%= a.class_name %></a></td>
+              <td><% if (a.subject_name) { %><%= a.subject_name %><% } else { %><span class="badge badge-soft-primary">Class Teacher</span><% } %></td>
+              <td>
+                <% if (a.subject_id) { %>
+                  <a href="/teacher/marks/<%= a.class_id %>/<%= a.subject_id %>" class="btn btn-sm btn-outline-primary">Enter marks</a>
+                <% } %>
+                <a href="/teacher/attendance/<%= a.class_id %>" class="btn btn-sm btn-outline-secondary">Attendance</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

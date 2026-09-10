@@ -1,0 +1,77 @@
+<div class="mb-3">
+  <a href="/teacher/classes/<%= classId %>" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+  <h4 class="fw-bold d-inline ms-2 mb-0">Marks Entry — <%= cls.name %> · <%= sub.name %></h4>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <span>Select examination</span>
+    <% if (exams.length) { %>
+      <select name="exam" class="form-select form-select-sm" style="min-width:300px" data-filter-form>
+        <% exams.forEach(e => { %>
+          <option value="<%= e.id %>" <%= String(examId) === String(e.id) ? 'selected' : '' %>><%= e.name %> (<%= e.term_name %>)</option>
+        <% }) %>
+      </select>
+    <% } else { %>
+      <span class="small text-muted">No examination created yet for <%= cls.name %>.</span>
+    <% } %>
+  </div>
+</div>
+
+<% if (!termId) { %>
+  <div class="text-center text-muted py-5">No active term for this class yet.</div>
+<% } else { %>
+  <form action="/teacher/marks/<%= classId %>/<%= subjectId %>" method="POST">
+    <input type="hidden" name="subject_id" value="<%= subjectId %>">
+    <% if (exam) { %>
+      <input type="hidden" name="exam_id" value="<%= exam.id %>">
+    <% } else { %>
+      <input type="hidden" name="term_id" value="<%= termId %>">
+    <% } %>
+    <div class="alert <%= exam ? 'alert-secondary' : 'alert-info' %> py-2 small mb-3">
+      <% if (exam) { %>
+        <i class="bi bi-pencil-square"></i> <%= exam.name %> · Max marks <%= exam.max_marks %> · <%= termName %>
+      <% } else { %>
+        <i class="bi bi-info-circle"></i> No examination yet — marks will be saved under a default <strong>Assessment</strong> for <strong><%= termName %></strong>. You can still enter marks for every student below.
+      <% } %>
+    </div>
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>All students of <%= cls.name %></span>
+        <span class="small text-muted"><%= students.length %> enrolled</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead><tr><th>Student</th><th>Marks</th><th>Grade</th><th>Remarks</th></tr></thead>
+            <tbody>
+              <% if (students.length === 0) { %><tr><td colspan="4" class="text-center text-muted py-4">No students enrolled in this class.</td></tr><% } %>
+              <% students.forEach(s => { %>
+                <tr>
+                  <td>
+                    <div class="fw-semibold"><%= s.name %></div>
+                    <div class="small text-muted"><%= s.admission_no %></div>
+                  </td>
+                  <td style="width:160px">
+                    <input type="hidden" name="student_id[]" value="<%= s.id %>">
+                    <input type="number" class="form-control form-control-sm marks-input" name="marks_value[]"
+                           value="<%= s.mark ? s.mark.marks_obtained : '' %>" min="0" max="<%= exam ? exam.max_marks : 100 %>" step="0.01">
+                  </td>
+                  <td>
+                    <% if (s.mark) { %><span class="badge badge-soft-primary"><%= s.mark.grade %></span><% } else { %>—<% } %>
+                  </td>
+                  <td>
+                    <input type="text" class="form-control form-control-sm" name="remarks[]" placeholder="Remarks" value="<%= s.mark ? s.mark.remarks || '' : '' %>">
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <% if (students.length) { %>
+      <button class="btn btn-primary mt-3"><i class="bi bi-save"></i> Save marks</button>
+    <% } %>
+  </form>
+<% } %>

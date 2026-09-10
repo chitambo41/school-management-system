@@ -1,0 +1,51 @@
+<div class="mb-3">
+  <a href="/teacher/classes/<%= classId %>" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+  <h4 class="fw-bold d-inline ms-2 mb-0">Attendance — <%= cls.name %></h4>
+</div>
+
+<form action="/teacher/attendance/<%= classId %>" method="POST">
+  <input type="hidden" name="date" value="<%= date %>">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span>Date</span>
+      <input type="date" name="date_picker" class="form-control form-control-sm" style="width:auto" value="<%= date %>"
+             onchange="window.location.href='/teacher/attendance/<%= classId %>?date='+this.value">
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-bordered mb-0">
+          <thead><tr><th style="width:40%">Student</th><th style="width:60%">Status</th></tr></thead>
+          <tbody>
+            <% if (students.length === 0) { %>
+              <tr><td colspan="2" class="text-center text-muted py-4">No students enrolled in this class.</td></tr>
+            <% } %>
+            <% students.forEach((s, i) => { %>
+              <tr>
+                <td>
+                  <div class="fw-semibold"><%= s.name %></div>
+                  <div class="small text-muted"><%= s.admission_no %></div>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center gap-4 flex-wrap">
+                    <% ['present','absent','late','excused'].forEach(st => { %>
+                      <label class="form-check-label me-2">
+                        <input type="radio" class="form-check-input" name="status[<%= i %>]" value="<%= st %>" data-student="<%= s.id %>"
+                          <%= statusMap[s.id] && statusMap[s.id].status === st ? 'checked' : '' %>>
+                        <span class="text-capitalize"><%= st %></span>
+                      </label>
+                    <% }) %>
+                  </div>
+                  <input type="hidden" name="student_id[]" value="<%= s.id %>">
+                  <input type="text" name="note[]" class="form-control form-control-sm mt-2" placeholder="Note (optional)" value="<%= statusMap[s.id] ? statusMap[s.id].note || '' : '' %>">
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <% if (students.length) { %>
+    <button class="btn btn-primary mt-3"><i class="bi bi-check-circle"></i> Save attendance</button>
+  <% } %>
+</form>

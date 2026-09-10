@@ -1,0 +1,22 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold mb-0"><i class="bi bi-bank me-2"></i>My Classes</h4>
+</div>
+
+<div class="row g-3">
+  <% classes.forEach(c => { %>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="mb-1"><%= c.name %> <span class="text-muted"><%= c.section || '' %></span></h5>
+          <div class="small text-muted mb-3">
+            <%= c.subj_count %> subject(s) assigned · <%= c.student_count %> student(s)
+          </div>
+          <a href="/teacher/classes/<%= c.id %>" class="btn btn-primary btn-sm w-100">Open class</a>
+        </div>
+      </div>
+    </div>
+  <% }) %>
+  <% if (classes.length === 0) { %>
+    <div class="col-12 text-center text-muted py-5">No classes assigned yet.</div>
+  <% } %>
+</div>

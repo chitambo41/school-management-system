@@ -1,0 +1,48 @@
+<div class="mb-3 d-flex justify-content-between align-items-center">
+  <div>
+    <a href="/teacher/classes" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+    <h4 class="fw-bold d-inline ms-2 mb-0"><%= cls.name %> <span class="text-muted"><%= cls.section || '' %></span></h4>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header">Students</div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead><tr><th>Admission No</th><th>Name</th><th>Gender</th></tr></thead>
+            <tbody>
+              <% if (students.length === 0) { %><tr><td colspan="3" class="text-center text-muted py-4">No students enrolled.</td></tr><% } %>
+              <% students.forEach(s => { %>
+                <tr>
+                  <td class="small text-muted"><%= s.admission_no %></td>
+                  <td class="fw-semibold"><%= s.name %></td>
+                  <td class="text-capitalize"><%= s.gender %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header">Quick Actions</div>
+      <div class="card-body">
+        <a href="/teacher/attendance/<%= cls.id %>" class="btn btn-outline-primary w-100 mb-2"><i class="bi bi-calendar-check"></i> Mark attendance</a>
+        <a href="/teacher/attendance-history/<%= cls.id %>" class="btn btn-outline-secondary w-100 mb-2"><i class="bi bi-clock-history"></i> Attendance history</a>
+        <a href="/teacher/comments/<%= cls.id %>" class="btn btn-outline-primary w-100 mb-2"><i class="bi bi-chat-quote"></i> Write comments</a>
+
+        <hr>
+        <h6 class="small fw-bold text-muted">Subjects I teach here</h6>
+        <% subjects.forEach(sub => { %>
+          <a href="/teacher/marks/<%= cls.id %>/<%= sub.id %>" class="btn btn-sm btn-outline-success w-100 mb-2"><i class="bi bi-graph-up"></i> Enter marks — <%= sub.name %></a>
+        <% }) %>
+        <% if (subjects.length === 0) { %><div class="small text-muted">No subjects assigned.</div><% } %>
+      </div>
+    </div>
+  </div>
+</div>

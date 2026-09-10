@@ -1,0 +1,75 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold mb-0"><i class="bi bi-calendar-check me-2"></i>Attendance</h4>
+</div>
+
+<form class="card card-body mb-3" action="/admin/attendance" method="GET">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label small">Class</label>
+      <select name="class" class="form-select form-select-sm" data-filter-form>
+        <% classes.forEach(c => { %>
+          <option value="<%= c.id %>" <%= String(classId) === String(c.id) ? 'selected' : '' %>><%= c.name %> <%= c.section || '' %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label small">Date</label>
+      <input type="date" name="date" class="form-control form-control-sm" value="<%= date %>">
+    </div>
+    <div class="col-md-4">
+      <button class="btn btn-outline-primary btn-sm">View attendance</button>
+    </div>
+  </div>
+</form>
+
+<% if (!cls) { %>
+  <div class="text-center text-muted py-5">No classes yet. <a href="/admin/classes/new">Create a class</a>.</div>
+<% } else { %>
+  <div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span><%= cls.name %> <%= cls.section || '' %> · <%= date %></span>
+      <span class="small text-muted">Attendance recorded by the class teachers. Admin view is read-only.</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-4">
+        <span><span class="badge badge-soft-success">Present</span> <strong><%= summary.present %></strong></span>
+        <span><span class="badge badge-soft-danger">Absent</span> <strong><%= summary.absent %></strong></span>
+        <span><span class="badge badge-soft-warning">Late</span> <strong><%= summary.late %></strong></span>
+        <span><span class="badge badge-soft-muted">Excused</span> <strong><%= summary.excused %></strong></span>
+        <span>Not marked: <strong><%= students.length - summary.present - summary.absent - summary.late - summary.excused %></strong></span>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-bordered mb-0 align-middle">
+          <thead>
+            <tr><th style="width:30%">Student</th><th style="width:15%">Status</th><th>Note</th><th style="width:15%">Recorded by</th></tr>
+          </thead>
+          <tbody>
+            <% if (students.length === 0) { %>
+              <tr><td colspan="4" class="text-center text-muted py-4">No students enrolled in this class.</td></tr>
+            <% } %>
+            <% students.forEach(s => { %>
+              <% const rec = statusMap[s.id]; %>
+              <tr>
+                <td>
+                  <div class="fw-semibold"><%= s.name %></div>
+                  <div class="small text-muted"><%= s.admission_no %></div>
+                </td>
+                <td>
+                  <% if (rec) { %>
+                    <span class="badge <%= rec.status === 'present' ? 'badge-soft-success' : (rec.status === 'late' ? 'badge-soft-warning' : (rec.status === 'absent' ? 'badge-soft-danger' : 'badge-soft-muted')) %>"><%= rec.status %></span>
+                  <% } else { %>
+                    <span class="text-muted">not marked</span>
+                  <% } %>
+                </td>
+                <td class="small"><%= rec && rec.note ? rec.note : '—' %></td>
+                <td class="small text-muted"><%= rec && rec.marked_by ? rec.marked_by : '—' %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+<% } %>

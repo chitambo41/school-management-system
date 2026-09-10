@@ -1,0 +1,37 @@
+<div class="mb-3">
+  <a href="/teacher/classes/<%= classId %>" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+  <h4 class="fw-bold d-inline ms-2 mb-0">Attendance History — <%= cls.name %></h4>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-bordered mb-0">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th><span class="badge badge-soft-success">Present</span></th>
+            <th><span class="badge badge-soft-danger">Absent</span></th>
+            <th><span class="badge badge-soft-warning">Late</span></th>
+            <th><span class="badge badge-soft-muted">Excused</span></th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% const dates = Object.keys(grouped).sort().reverse(); %>
+          <% if (dates.length === 0) { %><tr><td colspan="6" class="text-center text-muted py-4">No attendance records.</td></tr><% } %>
+          <% dates.forEach(d => { %>
+            <tr>
+              <td class="small"><%= d %></td>
+              <td><%= grouped[d].present %></td>
+              <td><%= grouped[d].absent %></td>
+              <td><%= grouped[d].late %></td>
+              <td><%= grouped[d].excused %></td>
+              <td class="fw-bold"><%= grouped[d].present + grouped[d].absent + grouped[d].late + grouped[d].excused %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

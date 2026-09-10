@@ -1,0 +1,41 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold mb-0"><i class="bi bi-person-workspace me-2"></i>Teachers &amp; Staff</h4>
+  <a href="/admin/teachers/new" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Add Teacher</a>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr><th>Name</th><th>Employment No</th><th>Email</th><th>Phone</th><th>Qualification</th><th>Experience</th><th>Status</th><th></th></tr>
+        </thead>
+        <tbody>
+          <% if (teachers.length === 0) { %>
+            <tr><td colspan="8" class="text-center text-muted py-4">No teachers registered.</td></tr>
+          <% } %>
+          <% teachers.forEach(t => { %>
+            <tr>
+              <td class="fw-semibold"><%= t.name %></td>
+              <td class="small text-muted"><%= t.employee_no %></td>
+              <td class="small"><%= t.email %></td>
+              <td class="small"><%= t.phone || '—' %></td>
+              <td class="small"><%= t.qualification || '—' %></td>
+              <td class="small"><%= t.experience_years %> yrs</td>
+              <td>
+                <% if (t.is_active) { %><span class="badge badge-soft-success">Active</span><% } %>
+                <% if (!t.is_active) { %><span class="badge badge-soft-muted">Inactive</span><% } %>
+              </td>
+              <td class="text-end">
+                <a href="/admin/teachers/<%= t.id %>/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+                <form action="/admin/teachers/<%= t.id %>/delete" method="POST" class="d-inline" onsubmit="return confirmDelete('Delete this teacher?')">
+                  <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

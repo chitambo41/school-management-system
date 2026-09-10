@@ -1,0 +1,24 @@
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-header">
+      <img src="/images/logo.jpg" alt="Opportunity School" class="auth-logo">
+      <h4>New Password</h4>
+      <p>Choose a new password for your account</p>
+    </div>
+    <div class="auth-body">
+      <form action="/auth/reset-password" method="POST">
+        <input type="hidden" name="token" value="<%= token %>">
+        <div class="mb-3">
+          <label class="form-label">New password</label>
+          <input type="password" name="password" class="form-control" minlength="6" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Confirm new password</label>
+          <input type="password" name="confirmPassword" class="form-control" minlength="6" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Update password</button>
+      </form>
+      <p class="text-center text-muted small mt-3 mb-0"><a href="/auth/login">Back to login</a></p>
+    </div>
+  </div>
+</div>

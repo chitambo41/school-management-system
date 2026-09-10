@@ -1,0 +1,74 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold mb-0"><i class="bi bi-file-bar-graph me-2"></i>Reports</h4>
+</div>
+
+<form class="card card-body mb-4" action="/admin/reports" method="GET">
+  <div class="row g-2">
+    <div class="col-md-4">
+      <label class="form-label small">Class</label>
+      <select name="class" class="form-select form-select-sm" data-filter-form>
+        <option value="">— select class —</option>
+        <% classes.forEach(c => { %><option value="<%= c.id %>" <%= String(cls) === String(c.id) ? 'selected' : '' %>><%= c.name %> <%= c.section || '' %></option><% }) %>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label small">Term (for results)</label>
+      <select name="term" class="form-select form-select-sm">
+        <option value="">All terms</option>
+        <% terms.forEach(t => { %><option value="<%= t.id %>" <%= String(tm) === String(t.id) ? 'selected' : '' %>><%= t.name %> (<%= t.year %>)</option><% }) %>
+      </select>
+    </div>
+    <div class="col-md-4 d-flex align-items-end">
+      <button class="btn btn-primary btn-sm w-100">Generate</button>
+    </div>
+  </div>
+</form>
+
+<% if (!cls) { %>
+  <div class="text-center text-muted py-5">Select a class to generate reports.</div>
+<% } else { %>
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header">Attendance Summary</div>
+        <div class="card-body p-0">
+          <table class="table mb-0">
+            <thead><tr><th>Status</th><th>Count</th></tr></thead>
+            <tbody>
+              <% attendanceSummary.forEach(a => { %>
+                <tr>
+                  <td><span class="badge badge-soft-<%= a.status === 'present' ? 'success' : (a.status === 'absent' ? 'danger' : (a.status === 'late' ? 'warning' : 'muted')) %>"><%= a.status %></span></td>
+                  <td><span class="badge badge-soft-primary"><%= a.c %></span></td>
+                </tr>
+              <% }) %>
+              <tr class="table-light">
+                <td class="fw-bold">Total marked</td>
+                <td class="fw-bold"><%= attendanceSummary.reduce((s, a) => s + a.c, 0) %></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header">Results Overview (avg per subject)</div>
+        <div class="card-body p-0">
+          <table class="table mb-0">
+            <thead><tr><th>Subject</th><th>Avg marks</th><th>Entries</th></tr></thead>
+            <tbody>
+              <% if (resultSummary.length === 0) { %><tr><td colspan="3" class="text-muted">No results found.</td></tr><% } %>
+              <% resultSummary.forEach(r => { %>
+                <tr>
+                  <td><%= r.subject_name %></td>
+                  <td><span class="badge badge-soft-success"><%= r.avg_marks %></span></td>
+                  <td class="small text-muted"><%= r.entries %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+<% } %>

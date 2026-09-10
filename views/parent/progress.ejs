@@ -1,0 +1,74 @@
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <h4 class="fw-bold mb-0"><i class="bi bi-bar-chart me-2"></i>Academic Progress</h4>
+  <select name="child" class="form-select form-select-sm" data-filter-form style="min-width:180px">
+    <% children.forEach(c => { %>
+      <option value="<%= c.id %>" <%= String(childId) === String(c.id) ? 'selected' : '' %>><%= c.name %></option>
+    <% }) %>
+  </select>
+</div>
+
+<% if (children.length === 0) { %>
+  <div class="card"><div class="card-body text-center text-muted py-5">No children linked to your account.</div></div>
+<% } else { %>
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="card">
+        <div class="card-header">Attendance Summary</div>
+        <div class="card-body p-0">
+          <table class="table mb-0">
+            <thead><tr><th>Status</th><th>Days</th></tr></thead>
+            <tbody>
+              <% if (attendance.length === 0) { %><tr><td colspan="2" class="text-muted">No attendance recorded.</td></tr><% } %>
+              <% attendance.forEach(a => { %>
+                <tr>
+                  <td class="text-capitalize">
+                    <% if (a.status === 'present') { %><span class="badge badge-soft-success">Present</span><% } %>
+                    <% if (a.status === 'absent') { %><span class="badge badge-soft-danger">Absent</span><% } %>
+                    <% if (a.status === 'late') { %><span class="badge badge-soft-warning">Late</span><% } %>
+                    <% if (a.status === 'excused') { %><span class="badge badge-soft-muted">Excused</span><% } %>
+                  </td>
+                  <td><%= a.c %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+          <% const totalDays = attendance.reduce((sum, a) => sum + a.c, 0); %>
+          <% if (totalDays > 0) { %>
+            <% const present = attendance.find(a => a.status === 'present') || { c: 0 }; %>
+            <div class="p-3 small">
+              <div class="d-flex justify-content-between">
+                <span class="text-muted">Present rate</span>
+                <span class="fw-bold"><%= Math.round((present.c / totalDays) * 100) %>%</span>
+              </div>
+              <div class="progress mt-1" style="height:8px">
+                <div class="progress-bar bg-success" style="width:<%= (present.c / totalDays) * 100 %>%"></div>
+              </div>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="card">
+        <div class="card-header">Teacher Comments</div>
+        <div class="card-body p-0">
+          <ul class="list-group list-group-flush">
+            <% if (comments.length === 0) { %>
+              <li class="list-group-item text-muted">No teacher comments yet.</li>
+            <% } %>
+            <% comments.forEach(com => { %>
+              <li class="list-group-item">
+                <div class="d-flex justify-content-between">
+                  <strong class="small"><%= com.teacher_name %></strong>
+                  <span class="badge badge-soft-muted small"><%= com.term_name %></span>
+                </div>
+                <div class="small mt-1">"<%= com.comment %>"</div>
+              </li>
+            <% }) %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+<% } %>

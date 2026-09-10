@@ -1,0 +1,122 @@
+<div class="no-print mb-3 d-flex justify-content-between">
+  <a href="/admin/students/<%= report.student.id %>" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+  <div class="d-flex gap-2">
+    <% if (report.student.report_approved_at) { %>
+      <form action="/admin/students/<%= report.student.id %>/report/unapprove" method="POST" class="d-inline" onsubmit="return confirm('Remove approval? The parent will no longer be able to download this report.')">
+        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-x-circle"></i> Remove approval</button>
+      </form>
+    <% } else { %>
+      <form action="/admin/students/<%= report.student.id %>/report/approve" method="POST" class="d-inline">
+        <button class="btn btn-sm btn-success"><i class="bi bi-check2-circle"></i> Approve &amp; Publish Report</button>
+      </form>
+    <% } %>
+    <button class="btn btn-sm btn-outline-primary" onclick="window.print()"><i class="bi bi-printer"></i> Print / Save as PDF</button>
+    <a href="/admin/students/<%= report.student.id %>/report/print" class="btn btn-sm btn-primary"><i class="bi bi-file-earmark-pdf"></i> Download PDF</a>
+  </div>
+</div>
+
+<% if (report.student.report_approved_at) { %>
+  <div class="alert alert-success py-2 small"><i class="bi bi-patch-check"></i> Report <strong>approved &amp; printed</strong>
+    on <%= fmtDateTime(report.student.report_approved_at) %> by <%= report.student.report_approved_by_name || 'Admin' %> — the parent can now download the full PDF from their portal.</div>
+<% } else { %>
+  <div class="alert alert-warning py-2 small"><i class="bi bi-info-circle"></i> This report is <strong>not yet approved</strong>. The parent will only be able to download the PDF review after you approve &amp; publish it.</div>
+<% } %>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-3">
+        <div class="display-6"><i class="bi bi-person-circle text-primary"></i></div>
+        <h5 class="mb-0"><%= report.student.name %></h5>
+        <div class="text-muted small">Admission No: <%= report.student.admission_no %></div>
+      </div>
+      <div class="col-md-3">
+        <div class="small text-muted">Current Class</div>
+        <div class="fw-semibold"><%= report.current.class_name || '—' %></div>
+        <div class="small text-muted mt-2">Class Teacher</div>
+        <div class="fw-semibold"><%= report.current.class_teacher || '—' %></div>
+      </div>
+      <div class="col-md-3">
+        <div class="small text-muted">Gender</div>
+        <div class="fw-semibold text-capitalize"><%= report.student.gender %></div>
+        <div class="small text-muted mt-2">Date of Birth</div>
+        <div class="fw-semibold"><%= fmtDate(report.student.date_of_birth) %></div>
+      </div>
+      <div class="col-md-3">
+        <div class="small text-muted">Parent/Guardian</div>
+        <div class="fw-semibold"><%= report.student.parent_name || '—' %></div>
+        <% if (report.student.parent_email) { %><div class="small"><%= report.student.parent_email %></div><% } %>
+      </div>
+    </div>
+    <hr>
+    <div class="d-flex flex-wrap gap-4">
+      <span><span class="text-muted small">Overall (all terms):</span> <strong><%= report.overall.total %> / <%= report.overall.max %></strong></span>
+      <span><span class="text-muted small">Percentage:</span> <strong><%= report.overall.pct !== null ? report.overall.pct + '%' : '—' %></strong></span>
+      <span><span class="text-muted small">Grade:</span> <strong><%= report.overall.grade || '—' %></strong></span>
+    </div>
+  </div>
+</div>
+
+<% if (report.terms.length === 0) { %>
+  <div class="card"><div class="card-body text-center text-muted py-5">No marks recorded for this student yet.</div></div>
+<% } %>
+
+<% report.terms.forEach(t => { %>
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span><i class="bi bi-journal-text me-1"></i><%= t.name %> (<%= t.year %>)</span>
+      <% if (t.pct !== null) { %>
+        <span class="small">Total <strong><%= t.total %>/<%= t.max %></strong> · <%= t.pct %>% · Grade <span class="badge badge-soft-success"><%= t.grade %></span></span>
+      <% } %>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-sm table-bordered mb-0 align-middle">
+          <thead class="table-light">
+            <tr><th>Subject</th><th>Exams</th><th>Teacher(s) who entered marks</th><th>Total</th><th>%</th><th>Grade</th></tr>
+          </thead>
+          <tbody>
+            <% t.subjects.forEach(s => { %>
+              <tr>
+                <td class="fw-semibold"><%= s.subject_name %></td>
+                <td><%= s.exams %></td>
+                <td class="small"><%= s.teachers || '—' %></td>
+                <td><%= s.obtained %>/<%= s.max %></td>
+                <td><%= s.pct !== null ? s.pct + '%' : '—' %></td>
+                <td><% if (s.grade) { %><span class="badge badge-soft-primary"><%= s.grade %></span><% } else { %>—<% } %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card-header"><i class="bi bi-list-check me-1"></i>Marks per exam</div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-sm mb-0 align-middle">
+          <thead class="table-light">
+            <tr><th>Exam</th><th>Subject</th><th>Class</th><th>Marks</th><th>%</th><th>Grade</th><th>Remarks</th><th>Teacher</th></tr>
+          </thead>
+          <tbody>
+            <% t.details.forEach(d => { %>
+              <tr>
+                <td class="small"><%= d.exam_name %></td>
+                <td><%= d.subject_name %></td>
+                <td class="small"><%= d.class_name || '—' %></td>
+                <td><%= d.marks_obtained %>/<%= d.max_marks %></td>
+                <td><%= d.pct !== null ? d.pct + '%' : '—' %></td>
+                <td><% if (d.grade) { %><span class="badge badge-soft-primary"><%= d.grade %></span><% } else { %>—<% } %></td>
+                <td class="small"><%= d.remarks || '—' %></td>
+                <td class="small"><%= d.teacher || '—' %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+<% }) %>
+
+<div class="mb-2">
+  <span class="small text-muted">Grading: A (81-100) &bull; B (61-80) &bull; C (41-60) &bull; D (21-40) &bull; F (0-20)</span>
+</div>

@@ -1,0 +1,49 @@
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-header">
+      <img src="/images/logo.jpg" alt="Opportunity School" class="auth-logo">
+      <h4>Register</h4>
+      <p>Create a parent / guardian account</p>
+    </div>
+    <div class="auth-body">
+      <form action="/auth/register" method="POST" novalidate>
+        <div class="mb-3">
+          <label class="form-label">Full name</label>
+          <input type="text" name="name" value="<%= body.name || '' %>" class="form-control <%= errors.name ? 'is-invalid' : '' %>" required>
+          <% if (errors.name) { %><div class="invalid-feedback"><%= errors.name.msg %></div><% } %>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" value="<%= body.email || '' %>" class="form-control <%= errors.email ? 'is-invalid' : '' %>" required>
+          <% if (errors.email) { %><div class="invalid-feedback"><%= errors.email.msg %></div><% } %>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Phone (optional)</label>
+          <input type="text" name="phone" value="<%= body.phone || '' %>" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Relationship</label>
+          <select name="relationship" class="form-select">
+            <option value="mother">Mother</option>
+            <option value="father">Father</option>
+            <option value="guardian" selected>Guardian</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Password</label>
+          <input type="password" name="password" class="form-control <%= errors.password ? 'is-invalid' : '' %>" minlength="6" required>
+          <% if (errors.password) { %><div class="invalid-feedback"><%= errors.password.msg %></div><% } %>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Confirm password</label>
+          <input type="password" name="confirmPassword" class="form-control <%= errors.confirmPassword ? 'is-invalid' : '' %>" required>
+          <% if (errors.confirmPassword) { %><div class="invalid-feedback"><%= errors.confirmPassword.msg %></div><% } %>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Create account</button>
+      </form>
+      <hr>
+      <p class="text-center text-muted small mb-0">Already have an account? <a href="/auth/login">Login</a></p>
+    </div>
+  </div>
+</div>

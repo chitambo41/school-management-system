@@ -1,0 +1,65 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold mb-0"><i class="bi bi-clipboard-plus me-2"></i>Apply for Admission</h4>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <form action="/parent/apply" method="POST" enctype="multipart/form-data">
+      <h6 class="text-primary fw-bold">Student information</h6>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Student full name *</label>
+          <input type="text" name="student_name" value="<%= body.student_name || '' %>" class="form-control <%= errors.student_name ? 'is-invalid' : '' %>" required>
+          <% if (errors.student_name) { %><div class="invalid-feedback"><%= errors.student_name %></div><% } %>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Date of birth *</label>
+          <input type="date" name="date_of_birth" value="<%= body.date_of_birth || '' %>" class="form-control <%= errors.date_of_birth ? 'is-invalid' : '' %>" required>
+          <% if (errors.date_of_birth) { %><div class="invalid-feedback"><%= errors.date_of_birth %></div><% } %>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Gender *</label>
+          <select name="gender" class="form-select <%= errors.gender ? 'is-invalid' : '' %>" required>
+            <option value="">— select —</option>
+            <option value="female" <%= body.gender === 'female' ? 'selected' : '' %>>Female</option>
+            <option value="male" <%= body.gender === 'male' ? 'selected' : '' %>>Male</option>
+            <option value="other" <%= body.gender === 'other' ? 'selected' : '' %>>Other</option>
+          </select>
+          <% if (errors.gender) { %><div class="invalid-feedback"><%= errors.gender %></div><% } %>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Grade applying for *</label>
+          <select name="grade_applying" class="form-select <%= errors.grade_applying ? 'is-invalid' : '' %>" required>
+            <option value="">— select —</option>
+            <% classes.forEach(g => { %>
+              <option value="<%= g.name %>" <%= body.grade_applying === g.name ? 'selected' : '' %>><%= g.name %></option>
+            <% }) %>
+          </select>
+          <% if (errors.grade_applying) { %><div class="invalid-feedback"><%= errors.grade_applying %></div><% } %>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Previous school</label>
+          <input type="text" name="previous_school" value="<%= body.previous_school || '' %>" class="form-control" placeholder="Optional">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Previous grade</label>
+          <input type="text" name="previous_grade" value="<%= body.previous_grade || '' %>" class="form-control" placeholder="Optional">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Home address</label>
+          <input type="text" name="address" value="<%= body.address || '' %>" class="form-control" placeholder="Optional">
+        </div>
+      </div>
+
+      <hr>
+      <h6 class="text-primary fw-bold">Documents</h6>
+      <div class="mb-3">
+        <label class="form-label">Birth certificate, previous report cards, etc. (PDF / images, max 5MB each, up to 5 files)</label>
+        <input type="file" name="documents" class="form-control" multiple accept=".pdf,.jpg,.jpeg,.png">
+        <div class="form-text">Documents are optional and stored securely on the server.</div>
+      </div>
+
+      <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> Submit application</button>
+    </form>
+  </div>
+</div>

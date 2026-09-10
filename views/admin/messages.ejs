@@ -1,0 +1,80 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold mb-0"><i class="bi bi-envelope me-2"></i>Messages</h4>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="card">
+      <div class="card-header">Send a Message</div>
+      <div class="card-body">
+        <form action="/admin/messages" method="POST">
+          <div class="mb-2">
+            <label class="form-label small">Subject *</label>
+            <input type="text" name="subject" class="form-control" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Body *</label>
+            <textarea name="body" class="form-control" rows="4" required></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Send to</label>
+            <select name="audience" class="form-select" id="audienceSelect" required>
+              <option value="all_parents">All parents</option>
+              <option value="all_teachers">All teachers</option>
+              <option value="all_users">Everyone</option>
+              <option value="user">A specific user</option>
+            </select>
+          </div>
+          <div class="mb-3" id="userSelectWrap" style="display:none">
+            <label class="form-label small">Recipient</label>
+            <select name="recipient_id" class="form-select">
+              <option value="">— select user —</option>
+              <% users && users.forEach(u => { %>
+                <option value="<%= u.id %>"><%= u.name %> (<%= u.role %>)</option>
+              <% }) %>
+            </select>
+          </div>
+          <button class="btn btn-primary w-100">Send message</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead><tr><th>Subject</th><th>To</th><th>Date</th><th></th></tr></thead>
+          <tbody>
+            <% if (messages.length === 0) { %><tr><td colspan="4" class="text-center text-muted py-4">No messages sent.</td></tr><% } %>
+            <% messages.forEach(m => { %>
+              <tr>
+                <td>
+                  <div class="fw-semibold"><%= m.subject %></div>
+                  <div class="small text-muted"><%= m.body.length > 60 ? m.body.slice(0,60) + '…' : m.body %></div>
+                </td>
+                <td class="small"><%= m.audience == 'user' ? 'User' : m.audience.replace('all_','All ').replace('_',' ') %></td>
+                <td class="small text-muted"><%= fmtDateTime(m.created_at) %></td>
+                <td class="text-end">
+                  <form action="/admin/messages/<%= m.id %>/delete" method="POST" class="d-inline" onsubmit="return confirmDelete()">
+                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const sel = document.getElementById('audienceSelect');
+    const wrap = document.getElementById('userSelectWrap');
+    const toggle = () => { wrap.style.display = sel.value === 'user' ? '' : 'none'; };
+    sel.addEventListener('change', toggle);
+    toggle();
+  });
+</script>

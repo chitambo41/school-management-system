@@ -1,0 +1,68 @@
+<% const child = children.find(c => String(c.id) === String(childId)); %>
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <h4 class="fw-bold mb-0"><i class="bi bi-graph-up me-2"></i>Results</h4>
+  <div class="d-flex gap-2">
+    <select name="child" class="form-select form-select-sm" data-filter-form style="min-width:160px">
+      <% children.forEach(c => { %>
+        <option value="<%= c.id %>" <%= String(childId) === String(c.id) ? 'selected' : '' %>><%= c.name %></option>
+      <% }) %>
+    </select>
+    <select name="term" class="form-select form-select-sm" data-filter-form style="min-width:160px">
+      <% terms.forEach(t => { %>
+        <option value="<%= t.id %>" <%= String(termId) === String(t.id) ? 'selected' : '' %>><%= t.name %> (<%= t.year %>)</option>
+      <% }) %>
+    </select>
+  </div>
+</div>
+
+<% if (children.length === 0) { %>
+  <div class="card"><div class="card-body text-center text-muted py-5">No children linked to your account.</div></div>
+<% } else if (!termId) { %>
+  <div class="card"><div class="card-body text-center text-muted py-5">Please select a term.</div></div>
+<% } else if (!reportApproved) { %>
+  <div class="card">
+    <div class="card-body text-center py-5">
+      <i class="bi bi-lock-fill text-warning fs-3 d-block mb-2"></i>
+      <div class="text-muted">Results for <strong><%= child ? child.name : 'this child' %></strong> are not published yet.</div>
+      <div class="small text-muted">They will appear here as soon as the school approves and prints the report card.</div>
+    </div>
+  </div>
+<% } else if (marks.length === 0) { %>
+  <div class="card"><div class="card-body text-center text-muted py-5">No results available for this selection yet.</div></div>
+<% } else { %>
+  <div class="alert alert-success py-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <span><i class="bi bi-patch-check"></i> The report for <strong><%= child ? child.name : 'this child' %></strong> is <strong>approved</strong>. Download anytime.</span>
+    <a href="/parent/report/<%= childId %>/download" class="btn btn-sm btn-success"><i class="bi bi-file-earmark-pdf"></i> Download full report (PDF)</a>
+  </div>
+  <div class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead><tr><th>Subject</th><th>Exam</th><th>Marks</th><th>Grade</th><th>Remarks</th></tr></thead>
+          <tbody>
+            <% marks.forEach(m => { %>
+              <tr>
+                <td class="fw-semibold"><%= m.subject_name %></td>
+                <td class="small"><%= m.exam_name %></td>
+                <td><%= m.marks_obtained %>/<%= m.max_marks %></td>
+                <td><span class="badge badge-soft-primary"><%= m.grade %></span></td>
+                <td class="small"><%= m.remarks || '—' %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+          <tfoot>
+            <tr class="table-light">
+              <td colspan="2" class="fw-bold">Total</td>
+              <td class="fw-bold"><%= total %>/<%= max %></td>
+              <td colspan="2">Average:
+                <span class="badge badge-soft-success">
+                  <%= max ? Math.round((total / max) * 100 * 10) / 10 : 0 %>%
+                </span>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+<% } %>

@@ -1,0 +1,73 @@
+<div class="mb-3">
+  <a href="/admin/applications" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        Application #<%= app.id %>
+        <% if (app.status === 'approved') { %><span class="badge badge-soft-success">Approved</span><% } %>
+        <% if (app.status === 'pending') { %><span class="badge badge-soft-warning">Pending</span><% } %>
+        <% if (app.status === 'rejected') { %><span class="badge badge-soft-danger">Rejected</span><% } %>
+      </div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-4">Student name</dt><dd class="col-sm-8"><%= app.student_name %></dd>
+          <dt class="col-sm-4">Date of birth</dt><dd class="col-sm-8"><%= fmtDate(app.date_of_birth) %></dd>
+          <dt class="col-sm-4">Gender</dt><dd class="col-sm-8 text-capitalize"><%= app.gender %></dd>
+          <dt class="col-sm-4">Grade applying for</dt><dd class="col-sm-8"><%= app.grade_applying %></dd>
+          <dt class="col-sm-4">Previous school</dt><dd class="col-sm-8"><%= app.previous_school || '—' %></dd>
+          <dt class="col-sm-4">Previous grade</dt><dd class="col-sm-8"><%= app.previous_grade || '—' %></dd>
+          <dt class="col-sm-4">Address</dt><dd class="col-sm-8"><%= app.address || '—' %></dd>
+          <dt class="col-sm-4">Applied on</dt><dd class="col-sm-8"><%= fmtDateTime(app.created_at) %></dd>
+          <dt class="col-sm-4">Parent</dt><dd class="col-sm-8">
+            <%= app.parent_name %> &lt;<%= app.parent_email %>&gt;
+            <% if (app.parent_phone) { %> · <%= app.parent_phone %><% } %>
+          </dd>
+          <dt class="col-sm-4">Admin note</dt><dd class="col-sm-8"><%= app.admin_note || '—' %></dd>
+        </dl>
+
+        <% if (docs.length) { %>
+          <h6 class="mt-4">Uploaded documents</h6>
+          <ul class="list-group">
+            <% docs.forEach(d => { %>
+              <li class="list-group-item d-flex justify-content-between">
+                <span><%= d.split('/').pop() %></span>
+                <a href="<%= d %>" target="_blank" class="btn btn-sm btn-outline-primary"><i class="bi bi-download"></i> View</a>
+              </li>
+            <% }) %>
+          </ul>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <% if (app.status === 'pending') { %>
+      <div class="card mb-3">
+        <div class="card-header">Decision</div>
+        <div class="card-body">
+          <form action="/admin/applications/<%= app.id %>/approve" method="POST">
+            <div class="mb-2"><label class="form-label small">Note to parent</label>
+              <textarea name="admin_note" class="form-control form-control-sm" rows="2"></textarea></div>
+            <button class="btn btn-success w-100 mb-2"><i class="bi bi-check-circle"></i> Approve &amp; Create Student</button>
+          </form>
+          <form action="/admin/applications/<%= app.id %>/reject" method="POST">
+            <div class="mb-2"><label class="form-label small">Rejection reason</label>
+              <textarea name="admin_note" class="form-control form-control-sm" rows="2"></textarea></div>
+            <button class="btn btn-outline-danger w-100"><i class="bi bi-x-circle"></i> Reject</button>
+          </form>
+        </div>
+      </div>
+    <% } else { %>
+      <div class="card">
+        <div class="card-header">Review info</div>
+        <div class="card-body">
+          <div class="small">Reviewed on <strong><%= fmtDateTime(app.reviewed_at) %></strong></div>
+          <% if (app.admin_note) { %><div class="small mt-2"><em><%= app.admin_note %></em></div><% } %>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>

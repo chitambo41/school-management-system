@@ -1,0 +1,19 @@
+# Node
+node_modules/
+npm-debug.log*
+*.log
+
+# Environment - never commit real secrets
+.env
+
+# Uploads (user-provided documents)
+public/uploads/*
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Nodemon
+nodemon.json

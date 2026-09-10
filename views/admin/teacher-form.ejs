@@ -1,0 +1,46 @@
+<div class="mb-3">
+  <a href="/admin/teachers" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+</div>
+
+<div class="card">
+  <div class="card-header"><%= teacher ? 'Edit Teacher' : 'Register Teacher' %></div>
+  <div class="card-body">
+    <form action="<%= teacher ? '/admin/teachers/' + teacher.id : '/admin/teachers' %>" method="POST">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Full name *</label>
+          <input type="text" name="name" value="<%= teacher ? teacher.name : '' %>" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Email *</label>
+          <input type="email" name="email" value="<%= teacher ? teacher.email : '' %>" class="form-control" <%= teacher ? 'readonly' : 'required' %>>
+        </div>
+        <% if (!teacher) { %>
+          <div class="col-md-6">
+            <label class="form-label">Temporary password *</label>
+            <input type="password" name="password" class="form-control" required minlength="6">
+          </div>
+        <% } %>
+        <div class="col-md-6">
+          <label class="form-label">Phone</label>
+          <input type="text" name="phone" value="<%= teacher ? teacher.phone || '' : '' %>" class="form-control">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Qualification</label>
+          <input type="text" name="qualification" value="<%= teacher ? teacher.qualification || '' : '' %>" class="form-control" placeholder="e.g. B.Sc, M.Ed">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Experience (years)</label>
+          <input type="number" name="experience_years" value="<%= teacher ? teacher.experience_years || 0 : 0 %>" class="form-control">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Hire date</label>
+          <input type="date" name="hire_date" value="<%= teacher ? teacher.hire_date || '' : '' %>" class="form-control">
+        </div>
+        <div class="col-12">
+          <button class="btn btn-primary"><%= teacher ? 'Save changes' : 'Create teacher' %></button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

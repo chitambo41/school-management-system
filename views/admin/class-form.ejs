@@ -1,0 +1,105 @@
+<div class="mb-3">
+  <a href="/admin/classes" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+</div>
+
+<div class="card">
+  <div class="card-header"><%= cls ? 'Edit Class' : 'Add Class' %></div>
+  <div class="card-body">
+    <form action="<%= cls ? '/admin/classes/' + cls.id : '/admin/classes' %>" method="POST">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Class name *</label>
+          <input type="text" name="name" value="<%= cls ? cls.name : '' %>" class="form-control" placeholder="e.g. Grade 5" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Section</label>
+          <input type="text" name="section" value="<%= cls ? cls.section || '' : '' %>" class="form-control" placeholder="e.g. A">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Description</label>
+          <textarea name="description" class="form-control" rows="3"><%= cls ? cls.description || '' : '' %></textarea>
+        </div>
+
+        <div class="col-12">
+          <hr class="my-1">
+          <label class="form-label">Class teacher</label>
+          <select name="teacher_id" class="form-select">
+            <option value="">— no teacher —</option>
+            <% teachers.forEach(t => { %>
+              <option value="<%= t.id %>" <%= String(teacherId) === String(t.id) ? 'selected' : '' %>><%= t.name %></option>
+            <% }) %>
+          </select>
+          <div class="form-text">The class teacher (homeroom) can confirm the term results and send them to the admin.</div>
+        </div>
+
+        <div class="col-12">
+          <hr class="my-1">
+          <label class="form-label">Subjects taught in this class &amp; their teachers</label>
+          <table class="table table-sm align-middle assign-table">
+            <thead><tr><th style="width:45%">Subject</th><th style="width:45%">Teacher</th><th style="width:10%"></th></tr></thead>
+            <tbody id="subjectRows">
+              <% (assignments || []).forEach(a => { %>
+                <tr>
+                  <td>
+                    <select name="subject_id[]" class="form-select form-select-sm">
+                      <% subjects.forEach(s => { %><option value="<%= s.id %>" <%= String(a.subject_id) === String(s.id) ? 'selected' : '' %>><%= s.name %></option><% }) %>
+                    </select>
+                  </td>
+                  <td>
+                    <select name="subject_teacher_id[]" class="form-select form-select-sm">
+                      <% teachers.forEach(t => { %><option value="<%= t.id %>" <%= String(a.teacher_id) === String(t.id) ? 'selected' : '' %>><%= t.name %></option><% }) %>
+                    </select>
+                  </td>
+                  <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()">&times;</button></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+          <button type="button" class="btn btn-sm btn-outline-secondary" id="addSubjectRow"><i class="bi bi-plus-lg"></i> Add subject</button>
+          <div class="form-text">Each subject teacher will be able to enter marks for the subject they teach in this class.</div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Add students to this class</label>
+          <div class="border rounded p-2 student-pick">
+            <% students.forEach(s => { %>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="student_ids[]" value="<%= s.id %>" id="st<%= s.id %>"
+                  <%= enrolled.includes(s.id) ? 'checked' : '' %>>
+                <label class="form-check-label small" for="st<%= s.id %>"><%= s.name %> <span class="text-muted">(<%= s.admission_no %>)</span></label>
+              </div>
+            <% }) %>
+            <% if (students.length === 0) { %>
+              <div class="text-muted small p-1">No active students. <a href="/admin/students/new">Add students</a> first.</div>
+            <% } %>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <button class="btn btn-primary"><%= cls ? 'Save changes' : 'Create class' %></button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const SUBJECTS = <%- JSON.stringify(subjects) %>;
+  const TEACHERS = <%- JSON.stringify(teachers) %>;
+  function subjectRowHTML(sub, teacher) {
+    const su = SUBJECTS.map(function (s) {
+      return '<option value="' + s.id + '"' + (String(s.id) === String(sub) ? ' selected' : '') + '>' + s.name + '</option>';
+    }).join('');
+    const te = TEACHERS.map(function (t) {
+      return '<option value="' + t.id + '"' + (String(t.id) === String(teacher) ? ' selected' : '') + '>' + t.name + '</option>';
+    }).join('');
+    return '<tr>' +
+      '<td><select name="subject_id[]" class="form-select form-select-sm">' + su + '</select></td>' +
+      '<td><select name="subject_teacher_id[]" class="form-select form-select-sm">' + te + '</select></td>' +
+      '<td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest(\'tr\').remove()">&times;</button></td>' +
+      '</tr>';
+  }
+  document.getElementById('addSubjectRow').addEventListener('click', function () {
+    document.getElementById('subjectRows').insertAdjacentHTML('beforeend', subjectRowHTML('', ''));
+  });
+</script>
