@@ -1,38 +1,46 @@
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h4 class="fw-bold mb-0"><i class="bi bi-speedometer2 me-2"></i>Teacher Dashboard</h4>
-  <span class="text-muted small">Welcome, <%= currentUser.name %></span>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-0 greeting">
+      <%
+        const hour = new Date().getHours();
+        const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+      %>
+      <%= greeting %>, <%= currentUser.name.split(' ')[0] %>
+    </h4>
+    <p class="text-muted small mb-0 mt-1">Welcome back to your teaching dashboard.</p>
+  </div>
 </div>
 
 <div class="row g-3 mb-4">
   <div class="col-md-4">
     <div class="stat-card stat-blue">
-      <i class="bi bi-bank fs-2"></i>
+      <div class="stat-icon"><i class="bi bi-bank"></i></div>
       <div><div class="num"><%= stats.classes %></div><div class="lbl">Classes I teach</div></div>
     </div>
   </div>
   <div class="col-md-4">
     <div class="stat-card stat-green">
-      <i class="bi bi-people fs-2"></i>
+      <div class="stat-icon"><i class="bi bi-people"></i></div>
       <div><div class="num"><%= stats.students %></div><div class="lbl">My students</div></div>
     </div>
   </div>
   <div class="col-md-4">
     <div class="stat-card stat-orange">
-      <i class="bi bi-calendar-check fs-2"></i>
-      <div><div class="num"><%= stats.todayAttendance %></div><div class="lbl">Attendance records today</div></div>
+      <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+      <div><div class="num"><%= stats.todayAttendance %></div><div class="lbl">Attendance today</div></div>
     </div>
   </div>
 </div>
 
 <div class="card">
-  <div class="card-header">My Subjects & Classes</div>
+  <div class="card-header"><i class="bi bi-journal-bookmark me-2 text-primary"></i>My Subjects & Classes</div>
   <div class="card-body p-0">
     <div class="table-responsive">
       <table class="table table-hover mb-0">
         <thead><tr><th>Class</th><th>Subject</th><th>Actions</th></tr></thead>
         <tbody>
           <% if (assignments.length === 0) { %>
-            <tr><td colspan="3" class="text-center text-muted py-4">You have not been assigned to any class yet. Please contact the admin.</td></tr>
+            <tr><td colspan="3"><div class="empty-state"><i class="bi bi-inbox"></i><p>You have not been assigned to any class yet.<br>Please contact the admin.</p></div></td></tr>
           <% } %>
           <% assignments.forEach(a => { %>
             <tr>

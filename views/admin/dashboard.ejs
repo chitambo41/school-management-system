@@ -1,30 +1,41 @@
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h4 class="fw-bold mb-0"><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</h4>
-  <span class="text-muted small">Academic year: <strong><%= activeYear || 'Not set' %></strong><% if (activeTerm) { %> · Term: <strong><%= activeTerm %></strong><% } %></span>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-0 greeting">
+      <%
+        const hour = new Date().getHours();
+        const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+      %>
+      <%= greeting %>, <%= currentUser.name.split(' ')[0] %>
+    </h4>
+    <p class="text-muted small mb-0 mt-1">Here's what's happening at your school today.</p>
+  </div>
+  <span class="badge badge-soft-primary d-none d-md-inline-block">
+    <i class="bi bi-calendar3 me-1"></i><%= activeYear || 'Not set' %><% if (activeTerm) { %> &middot; <%= activeTerm %><% } %>
+  </span>
 </div>
 
 <div class="row g-3 mb-4">
   <div class="col-6 col-md-3">
     <div class="stat-card stat-blue">
-      <i class="bi bi-people fs-2"></i>
+      <div class="stat-icon"><i class="bi bi-people"></i></div>
       <div><div class="num"><%= stats.students %></div><div class="lbl">Active Students</div></div>
     </div>
   </div>
   <div class="col-6 col-md-3">
     <div class="stat-card stat-green">
-      <i class="bi bi-person-workspace fs-2"></i>
+      <div class="stat-icon"><i class="bi bi-person-workspace"></i></div>
       <div><div class="num"><%= stats.teachers %></div><div class="lbl">Teachers</div></div>
     </div>
   </div>
   <div class="col-6 col-md-3">
     <div class="stat-card stat-purple">
-      <i class="bi bi-bank fs-2"></i>
+      <div class="stat-icon"><i class="bi bi-bank"></i></div>
       <div><div class="num"><%= stats.classes %></div><div class="lbl">Classes</div></div>
     </div>
   </div>
   <div class="col-6 col-md-3">
     <div class="stat-card stat-orange">
-      <i class="bi bi-clipboard-check fs-2"></i>
+      <div class="stat-icon"><i class="bi bi-clipboard-check"></i></div>
       <div><div class="num"><%= stats.pending %></div><div class="lbl">Pending Applications</div></div>
     </div>
   </div>
@@ -34,17 +45,18 @@
   <div class="col-lg-7">
     <div class="card">
       <div class="card-header d-flex justify-content-between align-items-center">
-        Recent Applications
+        <span><i class="bi bi-clipboard-check me-2 text-primary"></i>Recent Applications</span>
         <a href="/admin/applications" class="btn btn-sm btn-outline-primary">View all</a>
       </div>
       <div class="card-body p-0">
+        <div class="table-responsive">
         <table class="table table-hover mb-0">
           <thead>
             <tr><th>Student</th><th>Parent</th><th>Grade</th><th>Status</th><th>Date</th></tr>
           </thead>
           <tbody>
             <% if (recentApps.length === 0) { %>
-              <tr><td colspan="5" class="text-center text-muted py-4">No applications yet.</td></tr>
+              <tr><td colspan="5" class="text-center text-muted py-4"><div class="empty-state"><i class="bi bi-inbox"></i><p>No applications yet.</p></div></td></tr>
             <% } %>
             <% recentApps.forEach(a => { %>
               <tr>
@@ -61,16 +73,17 @@
             <% }) %>
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   </div>
   <div class="col-lg-5">
     <div class="card">
-      <div class="card-header">Recent Activity</div>
+      <div class="card-header"><i class="bi bi-activity me-2 text-success"></i>Recent Activity</div>
       <div class="card-body p-0">
         <ul class="list-group list-group-flush">
           <% if (recentLogs.length === 0) { %>
-            <li class="list-group-item text-muted">No activity yet.</li>
+            <li class="list-group-item text-center py-4"><div class="empty-state"><i class="bi bi-clock-history"></i><p>No activity yet.</p></div></li>
           <% } %>
           <% recentLogs.forEach(l => { %>
             <li class="list-group-item py-2">

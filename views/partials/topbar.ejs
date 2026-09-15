@@ -1,14 +1,17 @@
 <header class="topbar">
-  <div>
-    <img src="/images/logo.jpg" alt="Opportunity School" class="topbar-logo">
+  <div class="d-flex align-items-center gap-2">
+    <button class="hamburger" aria-label="Toggle menu">
+      <i class="bi bi-list"></i>
+    </button>
+    <img src="/images/logo.jpg" alt="Opportunity School" class="topbar-logo sm-hide">
   </div>
   <div class="d-flex align-items-center gap-3">
     <span class="badge badge-soft-primary d-none d-md-inline" title="Active academic period">
-      <i class="bi bi-calendar3 me-1"></i><%= activeYear || '—' %> · <%= activeTerm || 'Term —' %>
+      <i class="bi bi-calendar3 me-1"></i><%= activeYear || '—' %> &middot; <%= activeTerm || 'Term —' %>
     </span>
     <span class="text-muted small d-none d-md-inline"><i class="bi bi-person-circle me-1"></i><%= currentUser.name %></span>
     <form action="/auth/logout" method="POST" class="d-inline">
-      <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-box-arrow-right"></i> Log out</button>
+      <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-box-arrow-right"></i> <span class="sm-hide">Log out</span></button>
     </form>
   </div>
 </header>

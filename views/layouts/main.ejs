@@ -8,9 +8,11 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <link href="/css/style.css" rel="stylesheet">
 </head>
-<body>
-  <!-- If the current user is logged in, show the app shell -->
+<body class="<%= currentUser ? 'role-' + currentUser.role : '' %>">
   <% if (currentUser) { %>
+    <!-- Mobile sidebar overlay -->
+    <div class="sidebar-overlay"></div>
+
     <div class="d-md-flex">
       <%- include('../partials/sidebar', { active: typeof active !== 'undefined' ? active : '' }) %>
       <div class="main-area">
@@ -22,7 +24,6 @@
       </div>
     </div>
   <% } else { %>
-    <!-- Public pages still get a minimal nav via the route's own layout -->
     <div class="content">
       <%- include('../partials/flash') %>
       <%- body %>
